@@ -10,3 +10,8 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
+*/x64/
+*/.vs/
+CS230 Project3/Build/
+CS230 Project3/Trace.log
+CS230 Project3/bin/
