@@ -15,3 +15,4 @@ CMakeUserPresets.json
 CS230 Project3/Build/
 CS230 Project3/Trace.log
 CS230 Project3/bin/
+*.vcxproj.user
