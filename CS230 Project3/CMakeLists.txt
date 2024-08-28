@@ -15,31 +15,51 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 # set configuration types - Debug and Release - x64 only
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
-# get the architecture of the build machine
-#if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-#    set(ARCH "x64")
-#else()
-#    set(ARCH "Win32")
-#endif()
+# Set the output directories for the build configurations
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/bin/x64/Debug")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/bin/x64/Release")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/bin/x64/Debug")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/bin/x64/Release")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/bin/x64/Debug")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/bin/x64/Release")
 
-# get configuration type
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/x64/Debug)
-    set(DGL_NAME DGL_d)
-else()
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/x64/Release)
-    set(DGL_NAME DGL)
-endif()  
+# Find the DGL library to be linked
+set(DGL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/DGL/lib/x64")
+find_library(DGL_LIB_DEBUG DGL_d HINTS "${DGL_PATH}")
+find_library(DGL_LIB_RELEASE DGL HINTS "${DGL_PATH}")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/DGL/inc)
-find_library(DGL_LIBRARY ${DGL_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/DGL/lib/x64")
-message(STATUS "DGL Library: ${DGL_LIBRARY}")
-message(STATUS "Output Directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+# Create the Engine library
+add_library(EngineLib STATIC)
+target_include_directories(EngineLib PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+        ${CMAKE_CURRENT_SOURCE_DIR}/DGL/inc
+)
+target_link_libraries(EngineLib PRIVATE
+        debug ${DGL_LIB_DEBUG}
+        optimized ${DGL_LIB_RELEASE}
+)
 
-add_executable(Project3 ${SOURCE_FILES})
-target_link_libraries(Project3 ${DGL_LIBRARY})
-target_include_directories(Project3 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/DGL/inc)
+# Create the Project3 executable
+add_executable(Project3
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.c"
+)
+target_include_directories(Project3 PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+        ${CMAKE_CURRENT_SOURCE_DIR}/DGL/inc
+)
+target_link_libraries(Project3 PRIVATE
+        EngineLib
+        debug ${DGL_LIB_DEBUG}
+        optimized ${DGL_LIB_RELEASE}
+)
+add_dependencies(Project3 EngineLib)
+
+# Run script to copy DGL library, Assets, and Data to the output directory
+set(COPY_FILES_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/CopyFiles.bat")
+add_custom_command(TARGET Project3 POST_BUILD
+        COMMAND ${COPY_FILES_SCRIPT} $<$<CONFIG:DEBUG>:Debug> $<$<CONFIG:RELEASE>:Release>
+)
 
 # Project structure
 file (GLOB ENGINE_FILES
@@ -63,7 +83,6 @@ file(GLOB ENGINE_ENTITIES_COMPONENTS_TRANSFORM_FILES
 )
 file(GLOB ENGINE_FRAMEWORK_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Engine.*"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Matrix2D.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Stream.*"
@@ -94,7 +113,7 @@ file(GLOB GAME_SYSTEMS_CHEAT_FILES
 )
 
 # Add the files to the project
-target_sources(Project3 PRIVATE
+target_sources(EngineLib PRIVATE
         ${ENGINE_FILES}
         ${ENGINE_ENTITIES_FILES}
         ${ENGINE_ENTITIES_COMPONENTS_GRAPHICS_FILES}
@@ -115,7 +134,7 @@ source_group("Engine\\Entities\\Components\\Graphics" FILES ${ENGINE_ENTITIES_CO
 source_group("Engine\\Entities\\Components\\Physics" FILES ${ENGINE_ENTITIES_COMPONENTS_PHYSICS_FILES})
 source_group("Engine\\Entities\\Components\\Transform" FILES ${ENGINE_ENTITIES_COMPONENTS_TRANSFORM_FILES})
 source_group("Engine\\Framework" FILES ${ENGINE_FRAMEWORK_FILES})
-source_group("Engine\\Systems" FILES ${ENGINE_SYSTEMS})
+source_group("Engine\\Systems" FILES ${ENGINE_SYSTEMS_FILES})
 source_group("Engine\\Systems\\Platform" FILES ${ENGINE_SYSTEMS_PLATFORM_FILES})
 source_group("Engine\\Systems\\Scene" FILES ${ENGINE_SYSTEMS_SCENE_FILES})
 source_group("Game\\Scenes" FILES ${GAME_SCENES_FILES})
@@ -124,32 +143,120 @@ source_group("Game\\Systems\\Cheat" FILES ${GAME_SYSTEMS_CHEAT_FILES})
 # Visual Studio specific settings
 if(MSVC)
         # Set the startup project
-        set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT Project3)
+        set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Project3)
+
+        # Set the working directory
+        set_target_properties(Project3 PROPERTIES
+                VS_DEBUGGER_WORKING_DIRECTORY "$(OutDir)"
+        )
+        set_target_properties(EngineLib PROPERTIES
+                VS_DEBUGGER_WORKING_DIRECTORY "$(OutDir)"
+        )
         
         # General properties
         # warning level 4, treat warnings as errors, SDL checks
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /WX /sdl")
+        target_compile_options(Project3 PRIVATE /W4 /WX /sdl)
+        target_compile_options(EngineLib PRIVATE /W4 /WX /sdl)
         # Debug - Debug information format = Program Database for Edit and Continue,  Just My Code
         # Release - Debug info format = Program Database
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI /JMC")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
+        target_compile_options(Project3 PRIVATE
+                $<$<CONFIG:DEBUG>:/ZI /JMC>
+                $<$<CONFIG:RELEASE>:/Zi>
+        )
+        target_compile_options(EngineLib PRIVATE
+                $<$<CONFIG:DEBUG>:/ZI /JMC>
+                $<$<CONFIG:RELEASE>:/Zi>
+        )
 
         # Optimization properties
         # Release - enable intrinsic functions, enable whole program optimization
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Oi /GL")
+        target_compile_options(Project3 PRIVATE
+                $<$<CONFIG:RELEASE>:/Oi /GL>
+        )
+        target_compile_options(EngineLib PRIVATE
+                $<$<CONFIG:RELEASE>:/Oi /GL>
+        )
 
         # Preprocessor definitions
         # Debug - _DEBUG, _CONSOLE
         # Release - NDEBUG, _CONSOLE
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_DEBUG /D_CONSOLE")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /DNDEBUG /D_CONSOLE")
+        target_compile_options(Project3 PRIVATE
+                $<$<CONFIG:DEBUG>:/D_DEBUG /D_CONSOLE>
+                $<$<CONFIG:RELEASE>:/DNDEBUG /D_CONSOLE>
+        )
+        target_compile_options(EngineLib PRIVATE
+                $<$<CONFIG:DEBUG>:/D_DEBUG /D_CONSOLE>
+                $<$<CONFIG:RELEASE>:/DNDEBUG /D_CONSOLE>
+        )
 
         # Code Generation - Enable C++ exceptions, enable function-level linking
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /Gy")
+        target_compile_options(Project3 PRIVATE /EHsc /Gy)
+        target_compile_options(EngineLib PRIVATE /EHsc /Gy)
         # Language - C++17, Conformance mode
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /permissive-")
-        # Precompiled Headers - Create precompiled header file
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Yu")
+        target_compile_options(Project3 PRIVATE /std:c++17 /permissive-)
+        target_compile_options(EngineLib PRIVATE /std:c++17 /permissive-)
+        # Precompiled Headers - Use precompiled header file
+        # file(GLOB PCH_SOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.c")
+        # set(PCH_HEADER_NAME "stdafx.h")
+        # set(PCH_OUTPUT_DEBUG "${CMAKE_BINARY_DIR}/EngineLib.dir/Debug/EngineLib.pch")
+        # set(PCH_OUTPUT_RELEASE "${CMAKE_BINARY_DIR}/EngineLib.dir/Release/EngineLib.pch")
+        # target_compile_options(Project3 PRIVATE /Yu${PCH_HEADER_NAME}
+        #         /Fp$<$<CONFIG:DEBUG>:${PCH_OUTPUT_DEBUG}>$<$<CONFIG:RELEASE>:${PCH_OUTPUT_RELEASE}>
+        # )
+        # target_compile_options(EngineLib PRIVATE /Yu${PCH_HEADER_NAME}
+        #         /Fp$<$<CONFIG:DEBUG>:${PCH_OUTPUT_DEBUG}>$<$<CONFIG:RELEASE>:${PCH_OUTPUT_RELEASE}>
+        # )
+        # set_source_files_properties(${PCH_SOURCE_FILE} PROPERTIES COMPILE_OPTIONS /Yc${PCH_HEADER_NAME})
+        target_precompile_headers(EngineLib PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.h")
+        target_precompile_headers(Project3 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.h")
+
         # Advanced - Compile as C code, use full paths
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /TC /FC")
+        target_compile_options(Project3 PRIVATE /TC /FC)
+        target_compile_options(EngineLib PRIVATE /TC /FC)
+
+        # Linker properties
+        # Links library dependencies
+        #target_link_options(Project3 PRIVATE /WHOLEARCHIVE:EngineLib)
+
+        # General properties - Subsystem = Windows
+        target_link_options(Project3 PRIVATE /SUBSYSTEM:WINDOWS)
+        target_link_options(EngineLib PRIVATE /SUBSYSTEM:WINDOWS)
+        # Debugging properties - Generate debug information
+        target_link_options(Project3 PRIVATE /DEBUG)
+        target_link_options(EngineLib PRIVATE /DEBUG)
+        # Optimization properties
+        # Release - Enable references, enable COMDAT folding, fast link time code generation
+        target_link_options(Project3 PRIVATE
+                $<$<CONFIG:RELEASE>:/OPT:REF /OPT:ICF /LTCG:incremental>
+        )
+        target_link_options(EngineLib PRIVATE
+                $<$<CONFIG:RELEASE>:/OPT:REF /OPT:ICF /LTCG:incremental>
+        )
 endif()
+
+# Testing
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/ff233bdd4cac0a0bf6e5cd45bda3406814cb2796.zip
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(EngineLibTests
+        "${CMAKE_CURRENT_SOURCE_DIR}/Tests/EntityTests.cpp"
+)
+target_include_directories(EngineLibTests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+        ${CMAKE_CURRENT_SOURCE_DIR}/DGL/inc
+)
+target_link_libraries(EngineLibTests PRIVATE
+        EngineLib
+        GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(EngineLibTests)
