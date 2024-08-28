@@ -34,4 +34,4 @@ jobs:
 
     - name: CTest
       shell: bash
-      run: ctest --build-config Release
+      run: ctest --test-dir build --build-config Release
