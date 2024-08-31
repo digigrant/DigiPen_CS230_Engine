@@ -246,9 +246,11 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(EngineLibTests
-        "${CMAKE_CURRENT_SOURCE_DIR}/Tests/EntityTests.cpp"
+file(GLOB_RECURSE TEST_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/Tests/*.cpp"
 )
+add_executable(EngineLibTests ${TEST_FILES})
+
 target_include_directories(EngineLibTests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Source
         ${CMAKE_CURRENT_SOURCE_DIR}/DGL/inc
