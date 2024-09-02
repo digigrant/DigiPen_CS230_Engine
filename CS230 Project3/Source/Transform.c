@@ -13,6 +13,7 @@
 #include "Transform.h"
 #include "Vector2D.h"
 #include "Stream.h"
+#include "Matrix2D.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -24,9 +25,11 @@
 
 typedef struct Transform
 {
+	Matrix2D matrix;
 	Vector2D position;
 	Vector2D scale;
 	float rotation;
+	bool isDirty;
 } Transform;
 
 //------------------------------------------------------------------------------
@@ -40,6 +43,8 @@ typedef struct Transform
 //------------------------------------------------------------------------------
 // Private Function Declarations:
 //------------------------------------------------------------------------------
+
+void CalculateTransformationMatrix(Transform* transform);
 
 //------------------------------------------------------------------------------
 // Public Functions:
@@ -55,6 +60,8 @@ Transform* TransformCreate(void)
 		// Initialize scale to be non-zero
 		transform->scale.x = 1.0f;
 		transform->scale.y = 1.0f;
+
+		transform->isDirty = true;
 	}
 
 	return transform;
@@ -77,19 +84,32 @@ void TransformRead(Transform* transform, Stream stream)
 	StreamReadVector2D(stream, &(transform->scale));
 }
 
+const Matrix2D* TransformGetMatrix(Transform* transform)
+{
+	if (!transform) { return NULL; }
+
+	if (transform->isDirty)
+	{
+		CalculateTransformationMatrix(transform);
+		transform->isDirty = false;
+	}
+
+	return &(transform->matrix);
+}
+
 const Vector2D* TransformGetTranslation(const Transform* transform)
 {
-	return &(transform->position);
+	return (transform != NULL) ? &(transform->position) : NULL;
 }
 
 float TransformGetRotation(const Transform* transform)
 {
-	return transform->rotation;
+	return (transform != NULL) ? transform->rotation : 0.0f;
 }
 
 const Vector2D* TransformGetScale(const Transform* transform)
 {
-	return &(transform->scale);
+	return (transform != NULL) ? &(transform->scale) : NULL;
 }
 
 void TransformSetTranslation(Transform* transform, const Vector2D* translation)
@@ -110,3 +130,22 @@ void TransformSetScale(Transform* transform, const Vector2D* scale)
 //------------------------------------------------------------------------------
 // Private Functions:
 //------------------------------------------------------------------------------
+void CalculateTransformationMatrix(Transform* transform)
+{
+	Matrix2D result, buffer;
+	Matrix2DIdentity(&result);
+
+	Matrix2DTranslate(&buffer, -(transform->position.x), -(transform->position.y));
+	Matrix2DConcat(&result, &result, &buffer);
+
+	Matrix2DScale(&buffer, transform->scale.x, transform->scale.y);
+	Matrix2DConcat(&result, &result, &buffer);
+
+	Matrix2DRotRad(&buffer, transform->rotation);
+	Matrix2DConcat(&result, &result, &buffer);
+
+	Matrix2DTranslate(&buffer, transform->position.x, transform->position.y);
+	Matrix2DConcat(&result, &result, &buffer);
+
+	transform->matrix = result;
+}
