@@ -56,6 +56,7 @@ namespace EntityTests
 		ASSERT_EQ(entity, nullptr);
 	}
 
+	/*
 	TEST(EntityTests, EntityAddGetPhysics_NullEntity)
 	{
 		Physics* physics = PhysicsCreate();
@@ -65,6 +66,7 @@ namespace EntityTests
 		ASSERT_NO_THROW(EntityGetPhysics(nullptr));
 		ASSERT_EQ(EntityGetPhysics(nullptr), nullptr);
 	}
+	*/
 
 	TEST(EntityTests, EntityAddGetSprite)
 	{

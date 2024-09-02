@@ -55,14 +55,31 @@ void Matrix2DIdentity(Matrix2D* pResult)
 
 void Matrix2DTranspose(Matrix2D* pResult, const Matrix2D* pMtx)
 {
-	UNREFERENCED_PARAMETER(pResult);
-	UNREFERENCED_PARAMETER(pMtx);
+	if (pResult == NULL) { return; }
+
+	// Check case for in-place transpose
+	if (pResult == pMtx)
+	{
+		Matrix2D temp;
+		Matrix2DTranspose(&temp, pMtx);
+		*pResult = temp;
+		return;
+	}
+
+	for (int r = 0; r < 4; ++r)
+	{
+		for (int c = 0; c < 4; ++c)
+		{
+			Matrix2DRowCol(pResult, r, c) = pMtx->m[c][r];
+		}
+	}
 }
 
 void Matrix2DConcat(Matrix2D* pResult, const Matrix2D* pMtx0, const Matrix2D* pMtx1)
 {
 	if (pResult == NULL) { return; }
 
+	// Check case for in-place concatenation
 	if (pResult == pMtx0 || pResult == pMtx1)
 	{
 		Matrix2D temp;
@@ -129,9 +146,19 @@ void Matrix2DRotRad(Matrix2D* pResult, float angle)
 
 void Matrix2DMultVec(Vector2D* pResult, const Matrix2D* pMtx, const Vector2D* pVec)
 {
-	UNREFERENCED_PARAMETER(pResult);
-	UNREFERENCED_PARAMETER(pMtx);
-	UNREFERENCED_PARAMETER(pVec);
+	if (pResult == NULL) { return; }
+
+	// Check case for in-place multiplication
+	if (pResult == pVec)
+	{
+		Vector2D temp;
+		Matrix2DMultVec(&temp, pMtx, pVec);
+		*pResult = temp;
+		return;
+	}
+
+	pResult->x = pMtx->m[0][0] * pVec->x + pMtx->m[0][1] * pVec->y + pMtx->m[0][2] + pMtx->m[0][3];
+	pResult->y = pMtx->m[1][0] * pVec->x + pMtx->m[1][1] * pVec->y + pMtx->m[1][2] + pMtx->m[1][3];
 }
 
 //------------------------------------------------------------------------------
