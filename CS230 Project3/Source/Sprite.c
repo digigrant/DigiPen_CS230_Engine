@@ -97,8 +97,8 @@ void SpriteRender(const Sprite* sprite, Transform* transform)
 		DGL_Graphics_SetShaderMode(DGL_PSM_COLOR, DGL_VSM_DEFAULT);
 	}
 	
-	DGL_Graphics_SetCB_TransformData((DGL_Vec2*)TransformGetTranslation(transform), (DGL_Vec2*)TransformGetScale(transform), TransformGetRotation(transform));
-
+	DGL_Graphics_SetCB_TransformMatrix(TransformGetMatrix(transform));
+	
 	DGL_Graphics_SetCB_Alpha(sprite->alpha);
 	DGL_Graphics_SetCB_TintColor(&(DGL_Color) { 0.0f, 0.0f, 0.0f, 0.0f });
 

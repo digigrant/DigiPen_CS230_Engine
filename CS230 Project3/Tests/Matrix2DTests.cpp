@@ -109,12 +109,13 @@ namespace Matrix2DTests
 
 	TEST(Matrix2DConcatTest, ResultPointerSameAsInput)
 	{
-		Matrix2D mtx0 = GetIdentityMatrix();
-		Matrix2D mtx1 = GetIdentityMatrix();
+		Matrix2D mtx0 = { {{2, 3, 4, 1}, {5, 6, 7, 2}, {8, 9, 10, 3}, {1, 2, 3, 4}} };
+		Matrix2D mtx1 = { {{1, 0, 2, 0}, {0, 1, 0, 3}, {4, 0, 1, 0}, {0, 3, 0, 1}} };
+		Matrix2D expectedResult = { {{18, 6, 8, 10}, {33, 12, 17, 20}, {48, 18, 26, 30}, {13, 14, 5, 10}} };
 
 		Matrix2DConcat(&mtx0, &mtx0, &mtx1);
 
-		ASSERT_TRUE(AreMatricesEqual(&mtx0, &GetIdentityMatrix()));
+		ASSERT_TRUE(AreMatricesEqual(&mtx0, &expectedResult));
 	}
 
 	TEST(Matrix2DConcatTest, NullResultPointer)
@@ -124,15 +125,6 @@ namespace Matrix2DTests
 
 		ASSERT_NO_THROW(Matrix2DConcat(nullptr, &mtx0, &mtx1));
 	}
-
-	/*
-	TEST(Matrix2DConcatTest, NullMatrixPointers)
-	{
-		Matrix2D result;
-
-		ASSERT_NO_THROW(Matrix2DConcat(&result, nullptr, nullptr));
-	}
-	*/
 
 	TEST(Matrix2DTransposeTest, BasicTranspose)
 	{
@@ -170,15 +162,6 @@ namespace Matrix2DTests
 
 		ASSERT_NO_THROW(Matrix2DTranspose(nullptr, &mtx));
 	}
-
-	/*
-	TEST(Matrix2DTransposeTest, NullMatrixPointer)
-	{
-		Matrix2D result;
-
-		ASSERT_NO_THROW(Matrix2DTranspose(&result, nullptr));
-	}
-	*/
 
 	TEST(Matrix2DTranslateTest, BasicTranslate)
 	{

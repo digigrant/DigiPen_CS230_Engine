@@ -82,6 +82,7 @@ void TransformRead(Transform* transform, Stream stream)
 	StreamReadVector2D(stream, &(transform->position));
 	transform->rotation = StreamReadFloat(stream);
 	StreamReadVector2D(stream, &(transform->scale));
+	transform->isDirty = true;
 }
 
 const Matrix2D* TransformGetMatrix(Transform* transform)
@@ -115,16 +116,19 @@ const Vector2D* TransformGetScale(const Transform* transform)
 void TransformSetTranslation(Transform* transform, const Vector2D* translation)
 {
 	transform->position = *translation;
+	transform->isDirty = true;
 }
 
 void TransformSetRotation(Transform* transform, float rotation)
 {
 	transform->rotation = rotation;
+	transform->isDirty = true;
 }
 
 void TransformSetScale(Transform* transform, const Vector2D* scale)
 {
 	transform->scale = *scale;
+	transform->isDirty = true;
 }
 
 //------------------------------------------------------------------------------
@@ -135,17 +139,14 @@ void CalculateTransformationMatrix(Transform* transform)
 	Matrix2D result, buffer;
 	Matrix2DIdentity(&result);
 
-	Matrix2DTranslate(&buffer, -(transform->position.x), -(transform->position.y));
-	Matrix2DConcat(&result, &result, &buffer);
-
 	Matrix2DScale(&buffer, transform->scale.x, transform->scale.y);
-	Matrix2DConcat(&result, &result, &buffer);
+	Matrix2DConcat(&result, &buffer, &result);
 
 	Matrix2DRotRad(&buffer, transform->rotation);
-	Matrix2DConcat(&result, &result, &buffer);
+	Matrix2DConcat(&result, &buffer, &result);
 
 	Matrix2DTranslate(&buffer, transform->position.x, transform->position.y);
-	Matrix2DConcat(&result, &result, &buffer);
+	Matrix2DConcat(&result, &buffer, &result);
 
 	transform->matrix = result;
 }

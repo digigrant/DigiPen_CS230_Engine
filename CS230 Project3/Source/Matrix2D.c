@@ -70,11 +70,12 @@ void Matrix2DTranspose(Matrix2D* pResult, const Matrix2D* pMtx)
 	{
 		for (int c = 0; c < 4; ++c)
 		{
-			Matrix2DRowCol(pResult, r, c) = pMtx->m[c][r];
+			Matrix2DRowCol(pResult, r, c) = Matrix2DRowCol(pMtx, c, r);
 		}
 	}
 }
 
+// This should be called Matrix2DMultiply but the instructions say Matrix2DConcat
 void Matrix2DConcat(Matrix2D* pResult, const Matrix2D* pMtx0, const Matrix2D* pMtx1)
 {
 	if (pResult == NULL) { return; }
@@ -88,15 +89,16 @@ void Matrix2DConcat(Matrix2D* pResult, const Matrix2D* pMtx0, const Matrix2D* pM
 		return;
 	}
 
+	// Perform matrix multiplication
 	for (int i = 0; i < 4; ++i)
 	{
 		for (int j = 0; j < 4; ++j)
 		{
-			pResult->m[i][j] = 0;
+			Matrix2DRowCol(pResult, i, j) = 0;
 
 			for (int k = 0; k < 4; ++k)
 			{
-				pResult->m[i][j] += pMtx0->m[i][k] * pMtx1->m[k][j];
+				Matrix2DRowCol(pResult, i, j) += Matrix2DRowCol(pMtx0, i, k) * Matrix2DRowCol(pMtx1, k, j);
 			}
 		}
 	}
@@ -136,12 +138,10 @@ void Matrix2DRotRad(Matrix2D* pResult, float angle)
 
 	Matrix2DIdentity(pResult);
 
-	pResult->m[0][0] = (float)cos(angle);
-	pResult->m[0][1] = (float)-sin(angle);
-	pResult->m[1][0] = (float)sin(angle);
-	pResult->m[1][1] = (float)cos(angle);
-	pResult->m[2][2] = 1;
-	pResult->m[3][3] = 1;
+	Matrix2DRowCol(pResult, 0, 0) = (float)cos(angle);
+	Matrix2DRowCol(pResult, 0, 1) = (float)-sin(angle);
+	Matrix2DRowCol(pResult, 1, 0) = (float)sin(angle);
+	Matrix2DRowCol(pResult, 1, 1) = (float)cos(angle);
 }
 
 void Matrix2DMultVec(Vector2D* pResult, const Matrix2D* pMtx, const Vector2D* pVec)
@@ -157,8 +157,9 @@ void Matrix2DMultVec(Vector2D* pResult, const Matrix2D* pMtx, const Vector2D* pV
 		return;
 	}
 
-	pResult->x = pMtx->m[0][0] * pVec->x + pMtx->m[0][1] * pVec->y + pMtx->m[0][2] + pMtx->m[0][3];
-	pResult->y = pMtx->m[1][0] * pVec->x + pMtx->m[1][1] * pVec->y + pMtx->m[1][2] + pMtx->m[1][3];
+	// z implied to be 0, w implied to be 1
+	pResult->x = Matrix2DRowCol(pMtx, 0, 0) * pVec->x + Matrix2DRowCol(pMtx, 0, 1) * pVec->y + Matrix2DRowCol(pMtx, 0, 3);
+	pResult->y = Matrix2DRowCol(pMtx, 1, 0) * pVec->x + Matrix2DRowCol(pMtx, 1, 1) * pVec->y + Matrix2DRowCol(pMtx, 1, 3);
 }
 
 //------------------------------------------------------------------------------
