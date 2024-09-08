@@ -36,6 +36,7 @@ jobs:
       id: ctest
       shell: bash
       run: ctest --test-dir build --build-config Release
+      continue-on-error: true
 
     - name: Rerun Failed Tests with Output
       if: steps.ctest.outcome == 'failure'
