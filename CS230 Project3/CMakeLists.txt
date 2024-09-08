@@ -270,4 +270,6 @@ add_custom_command(TARGET EngineLibTests POST_BUILD
 )
 
 include(GoogleTest)
-gtest_discover_tests(EngineLibTests)
+gtest_discover_tests(EngineLibTests
+        WORKING_DIRECTORY $<$<CONFIG:DEBUG>:${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}>$<$<CONFIG:RELEASE>:${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}>
+)
