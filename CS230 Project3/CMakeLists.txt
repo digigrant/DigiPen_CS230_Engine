@@ -260,5 +260,14 @@ target_link_libraries(EngineLibTests PRIVATE
         GTest::gtest_main
 )
 
+set_target_properties(EngineLibTests PROPERTIES
+        VS_DEBUGGER_WORKING_DIRECTORY "$(OutDir)"
+)
+
+set(COPY_TEST_FILES_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/CopyTestFiles.bat")
+add_custom_command(TARGET EngineLibTests POST_BUILD
+        COMMAND ${COPY_TEST_FILES_SCRIPT} $<$<CONFIG:DEBUG>:Debug> $<$<CONFIG:RELEASE>:Release>
+)
+
 include(GoogleTest)
 gtest_discover_tests(EngineLibTests)

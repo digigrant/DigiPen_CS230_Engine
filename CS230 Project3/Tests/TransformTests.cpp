@@ -2,6 +2,7 @@
 #include "Transform.h"
 #include "Vector2D.h"
 #include "Matrix2D.h"
+#include "Stream.h"
 
 namespace TransformTests
 {
@@ -38,6 +39,35 @@ namespace TransformTests
 	{
 		Transform* transform = TransformCreate();
 		TransformFree(&transform);
+		TransformFree(&transform);
+		ASSERT_EQ(transform, nullptr);
+	}
+
+	TEST(TransformReadTests, ReadTransform)
+	{
+		Transform* transform = TransformCreate();
+		ASSERT_NE(transform, nullptr);
+
+		Stream stream = StreamOpen("TestData/TransformRead_data.txt");
+		ASSERT_NE(stream, nullptr);
+
+		TransformRead(transform, stream);
+
+		const Vector2D* translation = TransformGetTranslation(transform);
+		ASSERT_NE(translation, nullptr);
+		EXPECT_EQ(translation->x, 1.0f);
+		EXPECT_EQ(translation->y, 2.0f);
+
+		float rotation = TransformGetRotation(transform);
+		EXPECT_EQ(rotation, 90.0f);
+
+		const Vector2D* scale = TransformGetScale(transform);
+		ASSERT_NE(scale, nullptr);
+		EXPECT_EQ(scale->x, 3.0f);
+		EXPECT_EQ(scale->y, 4.0f);
+
+		StreamClose(&stream);
+		ASSERT_EQ(stream, nullptr);
 		TransformFree(&transform);
 		ASSERT_EQ(transform, nullptr);
 	}
