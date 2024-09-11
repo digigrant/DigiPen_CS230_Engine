@@ -63,6 +63,17 @@ Stream StreamOpen(const char* filePath)
 	return stream;
 }
 
+bool StreamReadBoolean(Stream stream)
+{
+	// Check if the stream is NULL
+	if (!stream) return false;
+
+	int value = 0;
+	fscanf_s(stream, "%d", &value);
+
+	return value != 0;
+}
+
 int StreamReadInt(Stream stream)
 {
 	// Check if the stream is NULL

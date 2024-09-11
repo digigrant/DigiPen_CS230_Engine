@@ -15,6 +15,7 @@
 #include "Transform.h"
 #include "Sprite.h"
 #include "Physics.h"
+#include "Animation.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -29,6 +30,7 @@
 typedef struct Entity
 {
 	char name[MAX_NAME_LENGTH];
+	Animation* animation;
 	Transform* transform;
 	Sprite* sprite;
 	Physics* physics;
@@ -79,6 +81,11 @@ void EntityFree(Entity** entity)
 		PhysicsFree(&((*entity)->physics));
 	}
 
+	if ((*entity)->animation)
+	{
+		AnimationFree(&((*entity)->animation));
+	}
+
 	// free entity
 	free(*entity);
 	(*entity) = NULL;
@@ -121,7 +128,21 @@ void EntityRead(Entity* entity, Stream stream)
 			PhysicsRead(entity->physics, stream);
 			continue;
 		}
+
+		// Animation component
+		if (strcmp(token, "Animation") == 0)
+		{
+			EntityAddAnimation(entity, AnimationCreate());
+			AnimationRead(entity->animation, stream);
+			continue;
+		}
 	}
+}
+
+void EntityAddAnimation(Entity* entity, Animation* animation)
+{
+	entity->animation = animation;
+	AnimationSetParent(entity->animation, entity);
 }
 
 void EntityAddPhysics(Entity* entity, Physics* physics)
@@ -149,6 +170,11 @@ const char* EntityGetName(const Entity* entity)
 	return (entity) ? entity->name : NULL;
 }
 
+Animation* EntityGetAnimation(const Entity* entity)
+{
+	return (entity) ? entity->animation : NULL;
+}
+
 Physics* EntityGetPhysics(const Entity* entity)
 {
 	return (entity) ? entity->physics : NULL;
@@ -169,6 +195,11 @@ void EntityUpdate(Entity* entity, float dt)
 	if (entity->physics && entity->transform)
 	{
 		PhysicsUpdate(entity->physics, entity->transform, dt);
+	}
+
+	if (entity->animation)
+	{
+		AnimationUpdate(entity->animation, dt);
 	}
 }
 

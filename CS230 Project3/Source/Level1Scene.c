@@ -27,6 +27,7 @@
 #include "Physics.h"
 #include "Entity.h"
 #include "EntityFactory.h"
+#include "Animation.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -41,6 +42,17 @@ static const float jumpVelocity = 1000.0f;
 static const Vector2D gravityNormal = { 0.0f, -1500.0f };
 static const Vector2D gravityNone = { 0.0f, 0.0f };
 
+enum MonkeyStates
+{
+	MonkeyIdle,
+	MonkeyWalk,
+	MonkeyJump,
+	MonkeyInvalid = -1
+};
+
+static const float wallDistance = 462.0f;
+static const float CheckSquareDistance = (75.0f * 75.0f);
+
 //------------------------------------------------------------------------------
 // Private Structures:
 //------------------------------------------------------------------------------
@@ -51,11 +63,28 @@ typedef struct Level1Scene
 	Scene	base;
 
 	// Add any scene-specific variables second.
-	int numLives;
 
-	Mesh* my_mesh;
-	SpriteSource* my_sprite_source;
-	Entity* my_entity;
+	// Mesh and SpriteSource for the planet
+	Mesh* mesh_planet;
+	SpriteSource* sprsrc_planet;
+	Entity* ent_planet;
+
+	// Mesh and SpriteSources for the monkey
+	Mesh* mesh_monkey;
+	SpriteSource* sprsrc_monkey_idle;
+	SpriteSource* sprsrc_monkey_walk;
+	SpriteSource* sprsrc_monkey_jump;
+	Entity* ent_monkey;
+
+	// Mesh and SpriteSource for the lives display
+	Mesh* mesh_lives;
+	SpriteSource* sprsrc_lives;
+	Entity* ent_lives;
+	
+	// Other data
+	int numLives;
+	char livesBuffer[16];
+	enum MonkeyStates monkeyState;
 
 } Level1Scene;
 
@@ -78,6 +107,9 @@ static void Level1SceneExit(void);
 static void Level1SceneUnload(void);
 static void Level1SceneRender(void);
 static void Level1SceneMovementController(Entity* entity);
+static void Level1SceneSetMonkeyState(Entity* entity, enum MonkeyStates new_state);
+static void Level1SceneBounceController(Entity* entity);
+static bool Level1SceneIsColliding(const Entity* entityA, const Entity* entityB);
 
 //------------------------------------------------------------------------------
 // Instance Variable:
@@ -89,10 +121,28 @@ static Level1Scene instance =
 	{ "Level1", Level1SceneLoad, Level1SceneInit, Level1SceneUpdate, Level1SceneRender, Level1SceneExit, Level1SceneUnload },
 
 	// Initialize any scene-specific variables:
-	0,	// numLives
-	NULL, // my_mesh
-	NULL, // my_sprite_source
-	NULL // my_entity
+
+	// Mesh and SpriteSource for the planet
+	NULL,
+	NULL,
+	NULL,
+
+	// Mesh and SpriteSources for the monkey
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+
+	// Mesh and SpriteSource for the lives display
+	NULL,
+	NULL,
+	NULL,
+
+	// Other data
+	-1,
+	{ 0 },
+	MonkeyInvalid
 };
 
 //------------------------------------------------------------------------------
@@ -122,25 +172,58 @@ static void Level1SceneLoad(void)
 		StreamClose(&s);
 	}
 
-	// Create a mesh
-	instance.my_mesh = MeshCreate();
-	MeshBuildQuad(instance.my_mesh, 0.5f, 0.5f, 1.0f, 1.0f, "Mesh1x1");
+	// Create meshes
+	instance.mesh_planet = MeshCreate();
+	MeshBuildQuad(instance.mesh_planet, 0.5f, 0.5f, 1.0f / 3, 1.0f / 3, "Mesh3x3");
+	instance.mesh_monkey = MeshCreate();
+	MeshBuildQuad(instance.mesh_monkey, 0.5f, 0.5f, 1.0f / 3, 1.0f / 3, "Mesh3x3");
+	instance.mesh_lives = MeshCreate();
+	MeshBuildQuad(instance.mesh_lives, 0.5f, 0.5f, 1.0f / 16, 1.0f / 8, "Mesh16x8");
 
-	// Create a sprite source
-	instance.my_sprite_source = SpriteSourceCreate();
-	SpriteSourceLoadTexture(instance.my_sprite_source, 1, 1, "PlanetTexture.png");
+	// Create sprite sources
+	instance.sprsrc_planet = SpriteSourceCreate();
+	SpriteSourceLoadTexture(instance.sprsrc_planet, 1, 1, "PlanetTexture.png");
+	instance.sprsrc_monkey_idle = SpriteSourceCreate();
+	SpriteSourceLoadTexture(instance.sprsrc_monkey_idle, 1, 1, "MonkeyIdle.png");
+	instance.sprsrc_monkey_walk = SpriteSourceCreate();
+	SpriteSourceLoadTexture(instance.sprsrc_monkey_walk, 3, 3, "MonkeyWalk.png");
+	instance.sprsrc_monkey_jump = SpriteSourceCreate();
+	SpriteSourceLoadTexture(instance.sprsrc_monkey_jump, 1, 1, "MonkeyJump.png");
+	instance.sprsrc_lives = SpriteSourceCreate();
+	SpriteSourceLoadTexture(instance.sprsrc_lives, 16, 8, "Roboto_Mono_black.png");
 }
 
 // Initialize the entities and variables used by the scene.
 static void Level1SceneInit()
 {
-	instance.my_entity = EntityFactoryBuild("./Data/PlanetJump.txt");
-
-	if (instance.my_entity)
+	// Create the planet entity
+	instance.ent_planet = EntityFactoryBuild("./Data/PlanetBounce.txt");
+	if (instance.ent_planet)
 	{
-		SpriteSetMesh(EntityGetSprite(instance.my_entity), instance.my_mesh);
-		SpriteSetSpriteSource(EntityGetSprite(instance.my_entity), instance.my_sprite_source);
-		SpriteSetFrame(EntityGetSprite(instance.my_entity), 0);
+		SpriteSetMesh(EntityGetSprite(instance.ent_planet), instance.mesh_planet);
+		SpriteSetSpriteSource(EntityGetSprite(instance.ent_planet), instance.sprsrc_planet);
+		SpriteSetFrame(EntityGetSprite(instance.ent_planet), 0);
+	}
+
+	// Create the monkey entity
+	instance.ent_monkey = EntityFactoryBuild("./Data/Monkey.txt");
+	if (instance.ent_monkey)
+	{
+		SpriteSetMesh(EntityGetSprite(instance.ent_monkey), instance.mesh_monkey);
+		instance.monkeyState = MonkeyIdle;
+		Level1SceneSetMonkeyState(instance.ent_monkey, MonkeyIdle);
+	}
+
+	// Create the lives display entity
+	instance.ent_lives = EntityFactoryBuild("./Data/MonkeyLivesText.txt");
+	if (instance.ent_lives)
+	{
+		Sprite* spr_lives = EntityGetSprite(instance.ent_lives);
+		SpriteSetMesh(spr_lives, instance.mesh_lives);
+		SpriteSetSpriteSource(spr_lives, instance.sprsrc_lives);
+		//SpriteSetFrame(EntityGetSprite(instance.ent_lives), 0);
+		sprintf_s(instance.livesBuffer, 16, "Lives: %d", instance.numLives);
+		//SpriteSetText(EntityGetSprite(instance.ent_lives), instance.livesBuffer);
 	}
 
 	DGL_Graphics_SetBackgroundColor(&(DGL_Color) { 1.0f, 1.0f, 1.0f, 1.0f });
@@ -152,8 +235,27 @@ static void Level1SceneInit()
 //	 dt = Change in time (in seconds) since the last game loop.
 static void Level1SceneUpdate(float dt)
 {
-	Level1SceneMovementController(instance.my_entity);
-	EntityUpdate(instance.my_entity, dt);
+	Level1SceneMovementController(instance.ent_monkey);
+	Level1SceneBounceController(instance.ent_planet);
+	EntityUpdate(instance.ent_monkey, dt);
+	EntityUpdate(instance.ent_planet, dt);
+	EntityUpdate(instance.ent_lives, dt);
+
+	if (Level1SceneIsColliding(instance.ent_monkey, instance.ent_planet))
+	{
+		--instance.numLives;
+		sprintf_s(instance.livesBuffer, 16, "Lives: %d", instance.numLives);
+		//SpriteSetText(EntityGetSprite(instance.ent_lives), instance.livesBuffer);
+		
+		if (instance.numLives <= 0)
+		{
+			SceneSystemSetNext(Level2SceneGetInstance());
+		}
+		else
+		{
+			SceneRestart();
+		}
+	}
 
 	if (DGL_Input_KeyDown('1'))
 	{
@@ -176,48 +278,64 @@ static void Level1SceneUpdate(float dt)
 // Render any objects associated with the scene.
 void Level1SceneRender(void)
 {
-	//DGL_Camera_SetPosition(&posCamera);
-
-	EntityRender(instance.my_entity);
+	EntityRender(instance.ent_planet);
+	EntityRender(instance.ent_monkey);
+	EntityRender(instance.ent_lives);
 }
 
 // Free any objects associated with the scene.
 static void Level1SceneExit()
 {
-	EntityFree(&instance.my_entity);
+	EntityFree(&instance.ent_planet);
+	EntityFree(&instance.ent_monkey);
+	EntityFree(&instance.ent_lives);
 }
 
 // Unload any resources used by the scene.
 static void Level1SceneUnload(void)
 {
-	SpriteSourceFree(&instance.my_sprite_source);
-	MeshFree(&instance.my_mesh);
+	MeshFree(&instance.mesh_planet);
+	MeshFree(&instance.mesh_monkey);
+	MeshFree(&instance.mesh_lives);
+	SpriteSourceFree(&instance.sprsrc_planet);
+	SpriteSourceFree(&instance.sprsrc_monkey_idle);
+	SpriteSourceFree(&instance.sprsrc_monkey_walk);
+	SpriteSourceFree(&instance.sprsrc_monkey_jump);
+	SpriteSourceFree(&instance.sprsrc_lives);
 }
 
 static void Level1SceneMovementController(Entity* entity)
 {
-	// Get Transform
 	Transform* transform = EntityGetTransform(entity);
-	// Get Physics
 	Physics* physics = EntityGetPhysics(entity);
 
 	if (!transform || !physics) { return; }
 
-	// Get the velocity
 	Vector2D velocity = *(PhysicsGetVelocity(physics));
 
-	// Get horizontal velocity
 	if (DGL_Input_KeyDown(VK_LEFT))
 	{
 		velocity.x = -moveVelocity;
+		if (instance.monkeyState != MonkeyJump)
+		{
+			Level1SceneSetMonkeyState(entity, MonkeyWalk);
+		}
 	}
 	if (DGL_Input_KeyDown(VK_RIGHT))
 	{
 		velocity.x = moveVelocity;
+		if (instance.monkeyState != MonkeyJump)
+		{
+			Level1SceneSetMonkeyState(entity, MonkeyWalk);
+		}
 	}
 	if (!DGL_Input_KeyDown(VK_LEFT) && !DGL_Input_KeyDown(VK_RIGHT))
 	{
 		velocity.x = 0.0f;
+		if (instance.monkeyState != MonkeyJump)
+		{
+			Level1SceneSetMonkeyState(entity, MonkeyIdle);
+		}
 	}
 
 	// Check for jump
@@ -225,6 +343,7 @@ static void Level1SceneMovementController(Entity* entity)
 	{
 		velocity.y = jumpVelocity;
 		PhysicsSetAcceleration(physics, &gravityNormal);
+		Level1SceneSetMonkeyState(entity, MonkeyJump);
 	}
 
 	if (TransformGetTranslation(transform)->y < groundHeight)
@@ -232,14 +351,88 @@ static void Level1SceneMovementController(Entity* entity)
 		TransformSetTranslation(transform, &(Vector2D) { TransformGetTranslation(transform)->x, groundHeight });
 		velocity.y = 0.0f;
 		PhysicsSetAcceleration(physics, &gravityNone);
-
-		--instance.numLives;
-		if (instance.numLives <= 0)
-		{
-			SceneSystemSetNext(Level2SceneGetInstance());
-		}
+		Level1SceneSetMonkeyState(entity, MonkeyIdle);
 	}
 
-	// Set the velocity
 	PhysicsSetVelocity(physics, &velocity);
+}
+
+static void Level1SceneSetMonkeyState(Entity* entity, enum MonkeyStates new_state)
+{
+	if (instance.monkeyState == new_state) { return; }
+
+	instance.monkeyState = new_state;
+
+	Sprite* sprite = EntityGetSprite(entity);
+	Animation* animation = EntityGetAnimation(entity);
+
+	switch (new_state)
+	{
+	case MonkeyIdle:
+		SpriteSetSpriteSource(sprite, instance.sprsrc_monkey_idle);
+		SpriteSetFrame(sprite, 0);
+		AnimationPlay(animation, 1, 0.0f, false);
+		break;
+
+	case MonkeyWalk:
+		SpriteSetSpriteSource(sprite, instance.sprsrc_monkey_walk);
+		SpriteSetFrame(sprite, 0);
+		AnimationPlay(animation, 8, 0.05f, true);
+		break;
+
+	case MonkeyJump:
+		SpriteSetSpriteSource(sprite, instance.sprsrc_monkey_jump);
+		SpriteSetFrame(sprite, 0);
+		AnimationPlay(animation, 1, 0.0f, false);
+		break;
+
+	default:
+		break;
+	}
+}
+
+static void Level1SceneBounceController(Entity* entity)
+{
+	Transform* transform = EntityGetTransform(entity);
+	Physics* physics = EntityGetPhysics(entity);
+
+	if (!transform || !physics) { return; }
+
+	Vector2D position = *(TransformGetTranslation(transform));
+	Vector2D velocity = *(PhysicsGetVelocity(physics));
+
+	if (position.x <= -wallDistance)
+	{
+		position.x = -wallDistance;
+		velocity.x = -velocity.x;
+	}
+	else if (position.x >= wallDistance)
+	{
+		position.x = wallDistance;
+		velocity.x = -velocity.x;
+	}
+
+	if (position.y < groundHeight)
+	{
+		position.y = groundHeight + (groundHeight - position.y);
+		velocity.y = -velocity.y;
+	}
+
+	TransformSetTranslation(transform, &position);
+	PhysicsSetVelocity(physics, &velocity);
+}
+
+static bool Level1SceneIsColliding(const Entity* entityA, const Entity* entityB)
+{
+	Transform* transformA = EntityGetTransform(entityA);
+	Transform* transformB = EntityGetTransform(entityB);
+
+	if (!transformA || !transformB) { return false; }
+
+	const Vector2D* positionA = TransformGetTranslation(transformA);
+	const Vector2D* positionB = TransformGetTranslation(transformB);
+
+	float distanceSquared = Vector2DSquareDistance(positionA, positionB);
+
+	return distanceSquared < CheckSquareDistance;
 }

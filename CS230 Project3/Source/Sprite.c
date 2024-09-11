@@ -58,7 +58,6 @@ Sprite* SpriteCreate(void)
 
 	if (sprite)
 	{
-		// set alpha
 		sprite->alpha = 1.0f;
 	}
 
@@ -67,7 +66,6 @@ Sprite* SpriteCreate(void)
 
 void SpriteFree(Sprite** sprite)
 {
-	// if input isn't valid, gtfo
 	if (!sprite || !(*sprite)) { return; }
 
 	free(*sprite);
@@ -78,7 +76,6 @@ void SpriteRead(Sprite* sprite, Stream stream)
 {
 	// if a bad sprite or stream is fed in, this will crash
 
-	// read data from file
 	sprite->frameIndex = StreamReadInt(stream);
 	sprite->alpha = StreamReadFloat(stream);
 }
@@ -140,6 +137,8 @@ void SpriteSetSpriteSource(Sprite* sprite, const SpriteSource* spriteSource)
 	// set sprite source - can be NULL
 	sprite->sprite_source = spriteSource;
 }
+
+
 
 //------------------------------------------------------------------------------
 // Private Functions:
