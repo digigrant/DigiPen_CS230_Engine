@@ -100,6 +100,31 @@ void AnimationSetParent(Animation* animation, Entity* parent)
 	animation->parent = parent;
 }
 
+/*
+* DBC:
+* - The frame count must be greater than 0.
+* - The frame duration must be greater than 0.
+* 
+* Acceptable Inputs:
+* - animation
+* -- Valid pointer to an Animation with a parent Entity that has a Sprite - The animation will play.
+* -- NULL - No effect. TODO: Print an error message.
+* -- Valid pointer to an Animation without a parent Entity - No effect. TODO: Print an error message.
+* -- Valid pointer to an Animation with a parent Entity that does not have a Sprite - No effect. TODO: Print an error message.
+* 
+* - frameCount
+* -- 0 - No effect. TODO: Print an error message.
+* -- 1+ - The frame count will be set to the input value.
+* 
+* - frameDuration
+* -- 0 - No effect. TODO: Print an error message.
+* -- 0.1+ - The frame duration will be set to the input value.
+* 
+* - isLooping
+* -- true - The animation will loop.
+* -- false - The animation will not loop.
+* 
+*/
 void AnimationPlay(Animation* animation, int frameCount, float frameDuration, bool isLooping)
 {
 	if (!animation) { return; }
@@ -116,9 +141,6 @@ void AnimationPlay(Animation* animation, int frameCount, float frameDuration, bo
 	SpriteSetFrame(EntityGetSprite(animation->parent), 0);
 }
 
-// Update the ...
-// Params:
-//	 dt = Change in time (in seconds) since the last game loop.
 void AnimationUpdate(Animation* animation, float dt)
 {
 	if (!animation) { return; }

@@ -134,7 +134,6 @@ void SpriteSetMesh(Sprite* sprite, const Mesh* mesh)
 
 void SpriteSetSpriteSource(Sprite* sprite, const SpriteSource* spriteSource)
 {
-	// set sprite source - can be NULL
 	sprite->sprite_source = spriteSource;
 }
 
