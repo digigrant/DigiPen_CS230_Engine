@@ -64,22 +64,24 @@ typedef struct Level1Scene
 
 	// Add any scene-specific variables second.
 
+	// Meshes
+	Mesh* mesh1x1;
+	Mesh* mesh3x3;
+	Mesh* mesh16x8;
+
 	// Mesh and SpriteSource for the planet
-	Mesh* mesh_planet;
-	SpriteSource* sprsrc_planet;
 	Entity* ent_planet;
+	SpriteSource* sprsrc_planet;
 
 	// Mesh and SpriteSources for the monkey
-	Mesh* mesh_monkey;
+	Entity* ent_monkey;
 	SpriteSource* sprsrc_monkey_idle;
 	SpriteSource* sprsrc_monkey_walk;
 	SpriteSource* sprsrc_monkey_jump;
-	Entity* ent_monkey;
 
 	// Mesh and SpriteSource for the lives display
-	Mesh* mesh_lives;
-	SpriteSource* sprsrc_lives;
 	Entity* ent_lives;
+	SpriteSource* sprsrc_lives;
 	
 	// Other data
 	int numLives;
@@ -122,20 +124,22 @@ static Level1Scene instance =
 
 	// Initialize any scene-specific variables:
 
-	// Mesh and SpriteSource for the planet
+	// Meshes
 	NULL,
 	NULL,
 	NULL,
 
-	// Mesh and SpriteSources for the monkey
+	// Entity and SpriteSource for the planet
 	NULL,
+	NULL,
+
+	// Entity and SpriteSources for the monkey
 	NULL,
 	NULL,
 	NULL,
 	NULL,
 
-	// Mesh and SpriteSource for the lives display
-	NULL,
+	// Entity and SpriteSource for the lives display
 	NULL,
 	NULL,
 
@@ -173,12 +177,12 @@ static void Level1SceneLoad(void)
 	}
 
 	// Create meshes
-	instance.mesh_planet = MeshCreate();
-	MeshBuildQuad(instance.mesh_planet, 0.5f, 0.5f, 1.0f / 3, 1.0f / 3, "Mesh3x3");
-	instance.mesh_monkey = MeshCreate();
-	MeshBuildQuad(instance.mesh_monkey, 0.5f, 0.5f, 1.0f / 3, 1.0f / 3, "Mesh3x3");
-	instance.mesh_lives = MeshCreate();
-	MeshBuildQuad(instance.mesh_lives, 0.5f, 0.5f, 1.0f / 16, 1.0f / 8, "Mesh16x8");
+	instance.mesh1x1 = MeshCreate();
+	MeshBuildQuad(instance.mesh1x1, 0.5f, 0.5f, 1.0f, 1.0f, "Mesh1x1");
+	instance.mesh3x3 = MeshCreate();
+	MeshBuildQuad(instance.mesh3x3, 0.5f, 0.5f, 1.0f / 3, 1.0f / 3, "Mesh3x3");
+	instance.mesh16x8 = MeshCreate();
+	MeshBuildQuad(instance.mesh16x8, 0.5f, 0.5f, 1.0f / 16, 1.0f / 8, "Mesh16x8");
 
 	// Create sprite sources
 	instance.sprsrc_planet = SpriteSourceCreate();
@@ -200,7 +204,7 @@ static void Level1SceneInit()
 	instance.ent_planet = EntityFactoryBuild("./Data/PlanetBounce.txt");
 	if (instance.ent_planet)
 	{
-		SpriteSetMesh(EntityGetSprite(instance.ent_planet), instance.mesh_planet);
+		SpriteSetMesh(EntityGetSprite(instance.ent_planet), instance.mesh1x1);
 		SpriteSetSpriteSource(EntityGetSprite(instance.ent_planet), instance.sprsrc_planet);
 		SpriteSetFrame(EntityGetSprite(instance.ent_planet), 0);
 	}
@@ -209,8 +213,7 @@ static void Level1SceneInit()
 	instance.ent_monkey = EntityFactoryBuild("./Data/Monkey.txt");
 	if (instance.ent_monkey)
 	{
-		SpriteSetMesh(EntityGetSprite(instance.ent_monkey), instance.mesh_monkey);
-		instance.monkeyState = MonkeyIdle;
+		instance.monkeyState = MonkeyInvalid;
 		Level1SceneSetMonkeyState(instance.ent_monkey, MonkeyIdle);
 	}
 
@@ -219,7 +222,7 @@ static void Level1SceneInit()
 	if (instance.ent_lives)
 	{
 		Sprite* spr_lives = EntityGetSprite(instance.ent_lives);
-		SpriteSetMesh(spr_lives, instance.mesh_lives);
+		SpriteSetMesh(spr_lives, instance.mesh16x8);
 		SpriteSetSpriteSource(spr_lives, instance.sprsrc_lives);
 		//SpriteSetFrame(EntityGetSprite(instance.ent_lives), 0);
 		sprintf_s(instance.livesBuffer, 16, "Lives: %d", instance.numLives);
@@ -257,19 +260,19 @@ static void Level1SceneUpdate(float dt)
 		}
 	}
 
-	if (DGL_Input_KeyDown('1'))
+	if (DGL_Input_KeyTriggered('1'))
 	{
 		SceneRestart();
 	}
-	if (DGL_Input_KeyDown('2'))
+	if (DGL_Input_KeyTriggered('2'))
 	{
 		SceneSystemSetNext(Level2SceneGetInstance());
 	}
-	if (DGL_Input_KeyDown('9'))
+	if (DGL_Input_KeyTriggered('9'))
 	{
 		SceneSystemSetNext(SandboxSceneGetInstance());
 	}
-	if (DGL_Input_KeyDown('0'))
+	if (DGL_Input_KeyTriggered('0'))
 	{
 		SceneSystemSetNext(DemoSceneGetInstance());
 	}
@@ -294,9 +297,9 @@ static void Level1SceneExit()
 // Unload any resources used by the scene.
 static void Level1SceneUnload(void)
 {
-	MeshFree(&instance.mesh_planet);
-	MeshFree(&instance.mesh_monkey);
-	MeshFree(&instance.mesh_lives);
+	MeshFree(&instance.mesh1x1);
+	MeshFree(&instance.mesh3x3);
+	MeshFree(&instance.mesh16x8);
 	SpriteSourceFree(&instance.sprsrc_planet);
 	SpriteSourceFree(&instance.sprsrc_monkey_idle);
 	SpriteSourceFree(&instance.sprsrc_monkey_walk);
@@ -369,20 +372,20 @@ static void Level1SceneSetMonkeyState(Entity* entity, enum MonkeyStates new_stat
 	switch (new_state)
 	{
 	case MonkeyIdle:
+		SpriteSetMesh(sprite, instance.mesh1x1);
 		SpriteSetSpriteSource(sprite, instance.sprsrc_monkey_idle);
-		SpriteSetFrame(sprite, 0);
 		AnimationPlay(animation, 1, 0.0f, false);
 		break;
 
 	case MonkeyWalk:
+		SpriteSetMesh(sprite, instance.mesh3x3);
 		SpriteSetSpriteSource(sprite, instance.sprsrc_monkey_walk);
-		SpriteSetFrame(sprite, 0);
 		AnimationPlay(animation, 8, 0.05f, true);
 		break;
 
 	case MonkeyJump:
+		SpriteSetMesh(sprite, instance.mesh1x1);
 		SpriteSetSpriteSource(sprite, instance.sprsrc_monkey_jump);
-		SpriteSetFrame(sprite, 0);
 		AnimationPlay(animation, 1, 0.0f, false);
 		break;
 
