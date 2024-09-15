@@ -119,6 +119,13 @@ void SceneSystemSetNext(const Scene* scene)
 	{
 		assert(SceneIsValid(scene) && "SceneSystemSetNext Error: A scene is missing one or more functions.");
 	}
+
+	if (scene == instance.activeScene)
+	{
+		SceneSystemRestart();
+		return;
+	}
+
 	instance.nextScene = scene;
 }
 

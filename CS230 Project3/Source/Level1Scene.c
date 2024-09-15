@@ -256,23 +256,6 @@ static void Level1SceneUpdate(float dt)
 			SceneRestart();
 		}
 	}
-
-	if (DGL_Input_KeyTriggered('1'))
-	{
-		SceneRestart();
-	}
-	if (DGL_Input_KeyTriggered('2'))
-	{
-		SceneSystemSetNext(Level2SceneGetInstance());
-	}
-	if (DGL_Input_KeyTriggered('9'))
-	{
-		SceneSystemSetNext(SandboxSceneGetInstance());
-	}
-	if (DGL_Input_KeyTriggered('0'))
-	{
-		SceneSystemSetNext(DemoSceneGetInstance());
-	}
 }
 
 // Render any objects associated with the scene.

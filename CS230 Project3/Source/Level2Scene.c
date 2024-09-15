@@ -127,23 +127,6 @@ static void Level2SceneUpdate(float dt)
 	Level2SceneMovementController(instance.ent_spaceship);
 	EntityUpdate(instance.ent_spaceship, dt);
 
-	if (DGL_Input_KeyTriggered('1'))
-	{
-		SceneSystemSetNext(Level1SceneGetInstance());
-	}
-	if (DGL_Input_KeyTriggered('2'))
-	{
-		SceneRestart();
-	}
-	if (DGL_Input_KeyTriggered('9'))
-	{
-		SceneSystemSetNext(SandboxSceneGetInstance());
-	}
-	if (DGL_Input_KeyTriggered('0'))
-	{
-		SceneSystemSetNext(DemoSceneGetInstance());
-	}
-
 	if (DGL_Input_KeyTriggered('Z'))
 	{
 		SpriteSetAlpha(EntityGetSprite(instance.ent_spaceship), 0.5f);
