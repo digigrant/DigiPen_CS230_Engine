@@ -224,9 +224,8 @@ static void Level1SceneInit()
 		Sprite* spr_lives = EntityGetSprite(instance.ent_lives);
 		SpriteSetMesh(spr_lives, instance.mesh16x8);
 		SpriteSetSpriteSource(spr_lives, instance.sprsrc_lives);
-		//SpriteSetFrame(EntityGetSprite(instance.ent_lives), 0);
 		sprintf_s(instance.livesBuffer, 16, "Lives: %d", instance.numLives);
-		//SpriteSetText(EntityGetSprite(instance.ent_lives), instance.livesBuffer);
+		SpriteSetText(EntityGetSprite(instance.ent_lives), instance.livesBuffer);
 	}
 
 	DGL_Graphics_SetBackgroundColor(&(DGL_Color) { 1.0f, 1.0f, 1.0f, 1.0f });
@@ -247,8 +246,6 @@ static void Level1SceneUpdate(float dt)
 	if (Level1SceneIsColliding(instance.ent_monkey, instance.ent_planet))
 	{
 		--instance.numLives;
-		sprintf_s(instance.livesBuffer, 16, "Lives: %d", instance.numLives);
-		//SpriteSetText(EntityGetSprite(instance.ent_lives), instance.livesBuffer);
 		
 		if (instance.numLives <= 0)
 		{
