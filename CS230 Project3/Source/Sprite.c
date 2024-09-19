@@ -17,6 +17,7 @@
 #include "Mesh.h"
 #include "Transform.h"
 #include "SpriteSource.h"
+#include "Matrix2D.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -28,8 +29,9 @@
 
 typedef struct Sprite
 {
-	SpriteSource const* sprite_source;
-	Mesh const* mesh;
+	const SpriteSource* sprite_source;
+	const Mesh* mesh;
+	const char* text;
 	float alpha;
 	unsigned int frameIndex;
 } Sprite;
@@ -58,7 +60,6 @@ Sprite* SpriteCreate(void)
 
 	if (sprite)
 	{
-		// set alpha
 		sprite->alpha = 1.0f;
 	}
 
@@ -67,7 +68,6 @@ Sprite* SpriteCreate(void)
 
 void SpriteFree(Sprite** sprite)
 {
-	// if input isn't valid, gtfo
 	if (!sprite || !(*sprite)) { return; }
 
 	free(*sprite);
@@ -78,13 +78,14 @@ void SpriteRead(Sprite* sprite, Stream stream)
 {
 	// if a bad sprite or stream is fed in, this will crash
 
-	// read data from file
 	sprite->frameIndex = StreamReadInt(stream);
 	sprite->alpha = StreamReadFloat(stream);
 }
 
 void SpriteRender(const Sprite* sprite, Transform* transform)
 {
+	if (!sprite || !sprite->mesh) { return; }
+
 	// set shader mode based on whether sprite has a texture or not
 	if (sprite->sprite_source)	// texture
 	{
@@ -95,14 +96,42 @@ void SpriteRender(const Sprite* sprite, Transform* transform)
 	else	// colored mesh
 	{
 		DGL_Graphics_SetShaderMode(DGL_PSM_COLOR, DGL_VSM_DEFAULT);
+		DGL_Graphics_SetTexture(NULL);
 	}
 	
-	DGL_Graphics_SetCB_TransformData((DGL_Vec2*)TransformGetTranslation(transform), (DGL_Vec2*)TransformGetScale(transform), TransformGetRotation(transform));
-
 	DGL_Graphics_SetCB_Alpha(sprite->alpha);
 	DGL_Graphics_SetCB_TintColor(&(DGL_Color) { 0.0f, 0.0f, 0.0f, 0.0f });
 
-	MeshRender(sprite->mesh);
+	if (!(sprite->text))
+	{
+		DGL_Graphics_SetCB_TransformMatrix(TransformGetMatrix(transform));
+		MeshRender(sprite->mesh);
+	}
+	else
+	{
+		Matrix2D matrix, offset;
+		matrix = *(TransformGetMatrix(transform));
+		Matrix2DTranslate(&offset, TransformGetScale(transform)->x, 0.0f);
+
+		const char* text_iter = sprite->text;
+		while (*text_iter)
+		{
+			char current_char = *text_iter;
+			current_char -= ' ';
+			if (current_char >= 0 && current_char < 96)
+			{
+				SpriteSourceSetTextureOffset(sprite->sprite_source, current_char);
+
+				DGL_Graphics_SetCB_TransformMatrix(&matrix);
+				MeshRender(sprite->mesh);
+
+				++text_iter;
+
+				Matrix2DConcat(&matrix, &offset, &matrix);
+			}
+		}
+	}
+
 }
 
 float SpriteGetAlpha(const Sprite* sprite)
@@ -137,8 +166,12 @@ void SpriteSetMesh(Sprite* sprite, const Mesh* mesh)
 
 void SpriteSetSpriteSource(Sprite* sprite, const SpriteSource* spriteSource)
 {
-	// set sprite source - can be NULL
 	sprite->sprite_source = spriteSource;
+}
+
+void SpriteSetText(Sprite* sprite, const char* text)
+{
+	sprite->text = text;
 }
 
 //------------------------------------------------------------------------------

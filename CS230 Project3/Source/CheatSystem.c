@@ -11,13 +11,34 @@
 
 #include "stdafx.h"
 #include <Windows.h>
+#include "DGL.h"
 
 #include "BaseSystem.h"
 #include "CheatSystem.h"
+#include "Scene.h"
+#include "Level1Scene.h"
+#include "Level2Scene.h"
+#include "DemoScene.h"
+#include "SandboxScene.h"
+#include "SceneSystem.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
 //------------------------------------------------------------------------------
+typedef struct CheatSystemKeyBinding
+{
+	char key;
+	const Scene* (*getInstance)(void);
+
+} CheatSystemKeyBinding;
+
+static const CheatSystemKeyBinding cheatSystemKeyBindings[] =
+{
+	{ '1', Level1SceneGetInstance },
+	{ '2', Level2SceneGetInstance },
+	{ '9', SandboxSceneGetInstance },
+	{ '0', DemoSceneGetInstance }
+};
 
 //------------------------------------------------------------------------------
 // Private Structures:
@@ -90,8 +111,15 @@ static bool CheatSystemInit(void)
 //	 dt = Change in time (in seconds) since the last game loop.
 static void CheatSystemUpdate(float dt)
 {
-	// Tell the compiler that the 'dt' variable is unused.
 	UNREFERENCED_PARAMETER(dt);
+
+	for (int i = 0; i < sizeof(cheatSystemKeyBindings) / sizeof(CheatSystemKeyBinding); ++i)
+	{
+		if (DGL_Input_KeyTriggered(cheatSystemKeyBindings[i].key))
+		{
+			SceneSystemSetNext(cheatSystemKeyBindings[i].getInstance());
+		}
+	}
 }
 
 // Render any objects associated with the Cheat System.

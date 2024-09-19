@@ -276,27 +276,6 @@ static void DemoSceneUpdate(float dt)
 
 		// TODO: Update the rotation value.
 		rotation += rotationSpeed * dt;
-
-		// TODO: Add code to restart the level when the ‘0’ key is triggered (when the key changes state from not pressed to pressed).
-		if (DGL_Input_KeyTriggered('0'))
-		{
-			SceneRestart();
-		}
-
-		if (DGL_Input_KeyTriggered('1'))
-		{
-			SceneSystemSetNext(Level1SceneGetInstance());
-		}
-
-		if (DGL_Input_KeyTriggered('2'))
-		{
-			SceneSystemSetNext(Level2SceneGetInstance());
-		}
-
-		if (DGL_Input_KeyTriggered('9'))
-		{
-			SceneSystemSetNext(SandboxSceneGetInstance());
-		}
 	}
 }
 

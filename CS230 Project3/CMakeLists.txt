@@ -38,6 +38,11 @@ target_link_libraries(EngineLib PRIVATE
         debug ${DGL_LIB_DEBUG}
         optimized ${DGL_LIB_RELEASE}
 )
+# Run script to copy DGL library, Assets, and Data to the output directory
+set(COPY_FILES_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/CopyFiles.bat")
+add_custom_command(TARGET EngineLib POST_BUILD
+        COMMAND ${COPY_FILES_SCRIPT} $<$<CONFIG:DEBUG>:Debug> $<$<CONFIG:RELEASE>:Release>
+)
 
 # Create the Project3 executable
 add_executable(Project3
@@ -54,12 +59,6 @@ target_link_libraries(Project3 PRIVATE
         optimized ${DGL_LIB_RELEASE}
 )
 add_dependencies(Project3 EngineLib)
-
-# Run script to copy DGL library, Assets, and Data to the output directory
-set(COPY_FILES_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/CopyFiles.bat")
-add_custom_command(TARGET Project3 POST_BUILD
-        COMMAND ${COPY_FILES_SCRIPT} $<$<CONFIG:DEBUG>:Debug> $<$<CONFIG:RELEASE>:Release>
-)
 
 # Project structure
 file (GLOB ENGINE_FILES
@@ -250,7 +249,6 @@ file(GLOB_RECURSE TEST_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Tests/*.cpp"
 )
 add_executable(EngineLibTests ${TEST_FILES})
-
 target_include_directories(EngineLibTests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Source
         ${CMAKE_CURRENT_SOURCE_DIR}/DGL/inc
@@ -259,6 +257,18 @@ target_link_libraries(EngineLibTests PRIVATE
         EngineLib
         GTest::gtest_main
 )
+add_dependencies(EngineLibTests EngineLib)
+
+set_target_properties(EngineLibTests PROPERTIES
+        VS_DEBUGGER_WORKING_DIRECTORY "$(OutDir)"
+)
+
+set(COPY_TEST_FILES_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/CopyTestFiles.bat")
+add_custom_command(TARGET EngineLibTests POST_BUILD
+        COMMAND ${COPY_TEST_FILES_SCRIPT} $<$<CONFIG:DEBUG>:Debug> $<$<CONFIG:RELEASE>:Release>
+)
 
 include(GoogleTest)
-gtest_discover_tests(EngineLibTests)
+gtest_discover_tests(EngineLibTests
+        WORKING_DIRECTORY $<$<CONFIG:DEBUG>:${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}>$<$<CONFIG:RELEASE>:${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}>
+)

@@ -17,6 +17,7 @@
 #include "Engine.h"
 #include "PlatformSystem.h"
 #include "SceneSystem.h"
+#include "CheatSystem.h"
 
 //------------------------------------------------------------------------------
 // Main Function:
@@ -33,6 +34,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInstanceH, _
 
 	// NOTE: Certain modules need to be initialized first.
 	EngineAddSystem(PlatformSystemGetInstance(hInstance, show));
+	EngineAddSystem(CheatSystemGetInstance());
 	EngineAddSystem(SceneSystemGetInstance());
 
 	// NOTE: Other systems can be initialized later and in any order.
