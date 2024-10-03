@@ -12,8 +12,7 @@ _deps
 CMakeUserPresets.json
 */x64/
 */.vs/
-CS230 Project3 (Demo)
-CS230 Project3/Build/
-CS230 Project3/Trace.log
-CS230 Project3/bin/
+Build/
+Trace.log
+bin/
 *.vcxproj.user
