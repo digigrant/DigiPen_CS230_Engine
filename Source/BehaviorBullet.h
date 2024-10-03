@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	EntityFactory.h
+// File Name:	BehaviorBullet.h
 // Author(s):	Doug Schilling (dschilling)
 // Project:		Project 4
 // Course:		CS230S24
@@ -26,7 +26,7 @@ extern "C" {
 // Forward References:
 //------------------------------------------------------------------------------
 
-typedef struct Entity Entity;
+typedef struct Behavior Behavior;
 
 //------------------------------------------------------------------------------
 // Public Consts:
@@ -44,22 +44,9 @@ typedef struct Entity Entity;
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Build a single instance of the specified Entity.
-// (NOTE: Use sprintf_s() to construct a path name using objectName.)
-// (HINT: The correct path name should be constructed using "Data/&s.txt".)
-// (HINT: See project instructions.)
-// Params:
-//	 entityName = The name of the Entity to be constructed.
-// Returns:
-//	 If the objectName is not NULL,
-//	   then return a pointer to a new instance of the specified Entity,
-//	   else NULL.
-Entity* EntityFactoryBuild(const char * entityName);
-
-// Free all archetype Entities.
-// (Hint: If the "archetypes" container exists, then the EntityContainerFreeAll
-//    function must be called.)
-void EntityFactoryFreeAll();
+// Dynamically allocate a new (Bullet) behavior component.
+// (Hint: Use calloc() to ensure that all member variables are initialized to 0.)
+Behavior* BehaviorBulletCreate(void);
 
 //------------------------------------------------------------------------------
 

@@ -10,8 +10,8 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
-*/x64/
-*/.vs/
+x64/
+.vs/
 Build/
 Trace.log
 bin/

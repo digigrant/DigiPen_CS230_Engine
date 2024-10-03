@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	EntityFactory.h
-// Author(s):	Doug Schilling (dschilling)
+// File Name:	Behavior.c
+// Author(s):	Grant Joyner (g.joyner)
 // Project:		Project 4
 // Course:		CS230S24
 //
@@ -9,31 +9,15 @@
 //
 //------------------------------------------------------------------------------
 
-#pragma once
+#include "stdafx.h"
+#include "Behavior.h"
 
 //------------------------------------------------------------------------------
-// Include Files:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-
-#ifdef __cplusplus
-extern "C" {
-	/* Assume C declarations for C++ */
-#endif
-
-//------------------------------------------------------------------------------
-// Forward References:
-//------------------------------------------------------------------------------
-
-typedef struct Entity Entity;
-
-//------------------------------------------------------------------------------
-// Public Consts:
+// Private Constants:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-// Public Structures:
+// Private Structures:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -41,29 +25,47 @@ typedef struct Entity Entity;
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
+// Private Variables:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Private Function Declarations:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Build a single instance of the specified Entity.
-// (NOTE: Use sprintf_s() to construct a path name using objectName.)
-// (HINT: The correct path name should be constructed using "Data/&s.txt".)
-// (HINT: See project instructions.)
-// Params:
-//	 entityName = The name of the Entity to be constructed.
-// Returns:
-//	 If the objectName is not NULL,
-//	   then return a pointer to a new instance of the specified Entity,
-//	   else NULL.
-Entity* EntityFactoryBuild(const char * entityName);
+Behavior* BehaviorClone(Behavior* other)
+{
+	UNREFERENCED_PARAMETER(other);
+	return NULL;
+}
 
-// Free all archetype Entities.
-// (Hint: If the "archetypes" container exists, then the EntityContainerFreeAll
-//    function must be called.)
-void EntityFactoryFreeAll();
+void BehaviorFree(Behavior** behavior)
+{
+	UNREFERENCED_PARAMETER(behavior);
+}
+
+void BehaviorRead(Behavior* behavior, Stream stream)
+{
+	UNREFERENCED_PARAMETER(behavior);
+	UNREFERENCED_PARAMETER(stream);
+}
+
+void BehaviorSetParent(Behavior* behavior, Entity* parent)
+{
+	UNREFERENCED_PARAMETER(behavior);
+	UNREFERENCED_PARAMETER(parent);
+}
+
+void BehaviorUpdate(Behavior* behavior, float dt)
+{
+	UNREFERENCED_PARAMETER(behavior);
+	UNREFERENCED_PARAMETER(dt);
+}
 
 //------------------------------------------------------------------------------
-
-#ifdef __cplusplus
-}                       /* End of extern "C" { */
-#endif
+// Private Functions:
+//------------------------------------------------------------------------------
 

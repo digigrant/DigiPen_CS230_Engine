@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	EntityFactory.h
-// Author(s):	Doug Schilling (dschilling)
+// File Name:	AsteroidsScene.h
+// Author(s):	Grant Joyner (g.joyner)
 // Project:		Project 4
 // Course:		CS230S24
 //
@@ -18,18 +18,21 @@
 //------------------------------------------------------------------------------
 
 #ifdef __cplusplus
-extern "C" {
-	/* Assume C declarations for C++ */
+extern "C" {	// Assume C declarations for C++.
 #endif
 
 //------------------------------------------------------------------------------
 // Forward References:
 //------------------------------------------------------------------------------
 
-typedef struct Entity Entity;
+typedef struct Scene Scene;
 
 //------------------------------------------------------------------------------
-// Public Consts:
+// Public Constants:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Public Typedefs:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -44,26 +47,14 @@ typedef struct Entity Entity;
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Build a single instance of the specified Entity.
-// (NOTE: Use sprintf_s() to construct a path name using objectName.)
-// (HINT: The correct path name should be constructed using "Data/&s.txt".)
-// (HINT: See project instructions.)
-// Params:
-//	 entityName = The name of the Entity to be constructed.
+// Get the instance of the Stub Scene.
 // Returns:
-//	 If the objectName is not NULL,
-//	   then return a pointer to a new instance of the specified Entity,
-//	   else NULL.
-Entity* EntityFactoryBuild(const char * entityName);
-
-// Free all archetype Entities.
-// (Hint: If the "archetypes" container exists, then the EntityContainerFreeAll
-//    function must be called.)
-void EntityFactoryFreeAll();
+//	 Pointer to the base Scene structure for this derived Scene.
+const Scene* AsteroidsSceneGetInstance(void);
 
 //------------------------------------------------------------------------------
 
 #ifdef __cplusplus
-}                       /* End of extern "C" { */
+}                       // End of extern "C" {
 #endif
 
