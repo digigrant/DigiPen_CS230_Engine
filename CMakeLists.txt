@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
-project(CS230_Project3
+project(CS230_Engine
         VERSION 1.0
-        DESCRIPTION "Project3 - Transformations"
+        DESCRIPTION "DigiPen CS230 Engine"
         LANGUAGES CXX C)
 
 # Set the C++ standard to C++17
@@ -44,33 +44,48 @@ add_custom_command(TARGET EngineLib POST_BUILD
         COMMAND ${COPY_FILES_SCRIPT} $<$<CONFIG:DEBUG>:Debug> $<$<CONFIG:RELEASE>:Release>
 )
 
-# Create the Project3 executable
-add_executable(Project3
+# Create the EngineStart executable
+add_executable(EngineStart
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Main.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.c"
 )
-target_include_directories(Project3 PRIVATE
+target_include_directories(EngineStart PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Source
         ${CMAKE_CURRENT_SOURCE_DIR}/DGL/inc
 )
-target_link_libraries(Project3 PRIVATE
+target_link_libraries(EngineStart PRIVATE
         EngineLib
         debug ${DGL_LIB_DEBUG}
         optimized ${DGL_LIB_RELEASE}
 )
-add_dependencies(Project3 EngineLib)
+add_dependencies(EngineStart EngineLib)
 
 # Project structure
+
+# Engine
+# -- Entities
+# ---- Components
+# ------ Behavior
+# ------ Graphics
+# ------ Physics
+# ------ Transform
+
 file (GLOB ENGINE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Stub.*"
 )
+
 file(GLOB ENGINE_ENTITIES_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Entity.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/EntityFactory.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/EntityContainer.*"
+)
+file(GLOB ENGINE_ENTITIES_COMPONENTS_BEHAVIOR_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/Behavior.*"
 )
 file(GLOB ENGINE_ENTITIES_COMPONENTS_GRAPHICS_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Animation.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Mesh.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/MeshLibrary.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Sprite.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/SpriteSource.*"
 )
@@ -80,6 +95,14 @@ file(GLOB ENGINE_ENTITIES_COMPONENTS_PHYSICS_FILES
 file(GLOB ENGINE_ENTITIES_COMPONENTS_TRANSFORM_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Transform.*"
 )
+
+# (Engine)
+# -- (Entities)
+# ---- Framework
+# ---- Systems
+# ------ Platform
+# ------ Scene
+
 file(GLOB ENGINE_FRAMEWORK_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Engine.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Matrix2D.*"
@@ -100,14 +123,25 @@ file(GLOB ENGINE_SYSTEMS_SCENE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Scene.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/SceneSystem.*"
 )
+
+# Game
+# -- Behaviors
+# -- Scenes
+# -- Systems
+
+file(GLOB GAME_BEHAVIORS_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/BehaviorBullet.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/BehaviorSpaceship.*"
+)
 file(GLOB GAME_SCENES_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/AsteroidsScene.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/DemoScene.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Level1Scene.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Level2Scene.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/SandboxScene.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/StubScene.*"
 )
-file(GLOB GAME_SYSTEMS_CHEAT_FILES
+file(GLOB GAME_SYSTEMS_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/CheatSystem.*"
 )
 
@@ -115,6 +149,7 @@ file(GLOB GAME_SYSTEMS_CHEAT_FILES
 target_sources(EngineLib PRIVATE
         ${ENGINE_FILES}
         ${ENGINE_ENTITIES_FILES}
+        ${ENGINE_ENTITIES_COMPONENTS_BEHAVIOR_FILES}
         ${ENGINE_ENTITIES_COMPONENTS_GRAPHICS_FILES}
         ${ENGINE_ENTITIES_COMPONENTS_PHYSICS_FILES}
         ${ENGINE_ENTITIES_COMPONENTS_TRANSFORM_FILES}
@@ -122,13 +157,15 @@ target_sources(EngineLib PRIVATE
         ${ENGINE_SYSTEMS_FILES}
         ${ENGINE_SYSTEMS_PLATFORM_FILES}
         ${ENGINE_SYSTEMS_SCENE_FILES}
+        ${GAME_BEHAVIORS_FILES}
         ${GAME_SCENES_FILES}
-        ${GAME_SYSTEMS_CHEAT_FILES}
+        ${GAME_SYSTEMS_FILES}
 )
 
 # Group the files in the project
 source_group("Engine" FILES ${ENGINE_FILES})
 source_group("Engine\\Entities" FILES ${ENGINE_ENTITIES_FILES})
+source_group("Engine\\Entities\\Components\\Behavior" FILES ${ENGINE_ENTITIES_COMPONENTS_BEHAVIOR_FILES})
 source_group("Engine\\Entities\\Components\\Graphics" FILES ${ENGINE_ENTITIES_COMPONENTS_GRAPHICS_FILES})
 source_group("Engine\\Entities\\Components\\Physics" FILES ${ENGINE_ENTITIES_COMPONENTS_PHYSICS_FILES})
 source_group("Engine\\Entities\\Components\\Transform" FILES ${ENGINE_ENTITIES_COMPONENTS_TRANSFORM_FILES})
@@ -136,16 +173,17 @@ source_group("Engine\\Framework" FILES ${ENGINE_FRAMEWORK_FILES})
 source_group("Engine\\Systems" FILES ${ENGINE_SYSTEMS_FILES})
 source_group("Engine\\Systems\\Platform" FILES ${ENGINE_SYSTEMS_PLATFORM_FILES})
 source_group("Engine\\Systems\\Scene" FILES ${ENGINE_SYSTEMS_SCENE_FILES})
+source_group("Game\\Behaviors" FILES ${GAME_BEHAVIORS_FILES})
 source_group("Game\\Scenes" FILES ${GAME_SCENES_FILES})
-source_group("Game\\Systems\\Cheat" FILES ${GAME_SYSTEMS_CHEAT_FILES})
+source_group("Game\\Systems" FILES ${GAME_SYSTEMS_FILES})
 
 # Visual Studio specific settings
 if(MSVC)
         # Set the startup project
-        set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Project3)
+        set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT EngineStart)
 
         # Set the working directory
-        set_target_properties(Project3 PROPERTIES
+        set_target_properties(EngineStart PROPERTIES
                 VS_DEBUGGER_WORKING_DIRECTORY "$(OutDir)"
         )
         set_target_properties(EngineLib PROPERTIES
@@ -154,11 +192,11 @@ if(MSVC)
         
         # General properties
         # warning level 4, treat warnings as errors, SDL checks
-        target_compile_options(Project3 PRIVATE /W4 /WX /sdl)
+        target_compile_options(EngineStart PRIVATE /W4 /WX /sdl)
         target_compile_options(EngineLib PRIVATE /W4 /WX /sdl)
         # Debug - Debug information format = Program Database for Edit and Continue,  Just My Code
         # Release - Debug info format = Program Database
-        target_compile_options(Project3 PRIVATE
+        target_compile_options(EngineStart PRIVATE
                 $<$<CONFIG:DEBUG>:/ZI /JMC>
                 $<$<CONFIG:RELEASE>:/Zi>
         )
@@ -169,7 +207,7 @@ if(MSVC)
 
         # Optimization properties
         # Release - enable intrinsic functions, enable whole program optimization
-        target_compile_options(Project3 PRIVATE
+        target_compile_options(EngineStart PRIVATE
                 $<$<CONFIG:RELEASE>:/Oi /GL>
         )
         target_compile_options(EngineLib PRIVATE
@@ -179,7 +217,7 @@ if(MSVC)
         # Preprocessor definitions
         # Debug - _DEBUG, _CONSOLE
         # Release - NDEBUG, _CONSOLE
-        target_compile_options(Project3 PRIVATE
+        target_compile_options(EngineStart PRIVATE
                 $<$<CONFIG:DEBUG>:/D_DEBUG /D_CONSOLE>
                 $<$<CONFIG:RELEASE>:/DNDEBUG /D_CONSOLE>
         )
@@ -189,17 +227,17 @@ if(MSVC)
         )
 
         # Code Generation - Enable C++ exceptions, enable function-level linking
-        target_compile_options(Project3 PRIVATE /EHsc /Gy)
+        target_compile_options(EngineStart PRIVATE /EHsc /Gy)
         target_compile_options(EngineLib PRIVATE /EHsc /Gy)
         # Language - C++17, Conformance mode
-        target_compile_options(Project3 PRIVATE /std:c++17 /permissive-)
+        target_compile_options(EngineStart PRIVATE /std:c++17 /permissive-)
         target_compile_options(EngineLib PRIVATE /std:c++17 /permissive-)
         # Precompiled Headers - Use precompiled header file
         # file(GLOB PCH_SOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.c")
         # set(PCH_HEADER_NAME "stdafx.h")
         # set(PCH_OUTPUT_DEBUG "${CMAKE_BINARY_DIR}/EngineLib.dir/Debug/EngineLib.pch")
         # set(PCH_OUTPUT_RELEASE "${CMAKE_BINARY_DIR}/EngineLib.dir/Release/EngineLib.pch")
-        # target_compile_options(Project3 PRIVATE /Yu${PCH_HEADER_NAME}
+        # target_compile_options(EngineStart PRIVATE /Yu${PCH_HEADER_NAME}
         #         /Fp$<$<CONFIG:DEBUG>:${PCH_OUTPUT_DEBUG}>$<$<CONFIG:RELEASE>:${PCH_OUTPUT_RELEASE}>
         # )
         # target_compile_options(EngineLib PRIVATE /Yu${PCH_HEADER_NAME}
@@ -207,25 +245,25 @@ if(MSVC)
         # )
         # set_source_files_properties(${PCH_SOURCE_FILE} PROPERTIES COMPILE_OPTIONS /Yc${PCH_HEADER_NAME})
         target_precompile_headers(EngineLib PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.h")
-        target_precompile_headers(Project3 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.h")
+        target_precompile_headers(EngineStart PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.h")
 
         # Advanced - Compile as C code, use full paths
-        target_compile_options(Project3 PRIVATE /TC /FC)
+        target_compile_options(EngineStart PRIVATE /TC /FC)
         target_compile_options(EngineLib PRIVATE /TC /FC)
 
         # Linker properties
         # Links library dependencies
-        #target_link_options(Project3 PRIVATE /WHOLEARCHIVE:EngineLib)
+        #target_link_options(EngineStart PRIVATE /WHOLEARCHIVE:EngineLib)
 
         # General properties - Subsystem = Windows
-        target_link_options(Project3 PRIVATE /SUBSYSTEM:WINDOWS)
+        target_link_options(EngineStart PRIVATE /SUBSYSTEM:WINDOWS)
         target_link_options(EngineLib PRIVATE /SUBSYSTEM:WINDOWS)
         # Debugging properties - Generate debug information
-        target_link_options(Project3 PRIVATE /DEBUG)
+        target_link_options(EngineStart PRIVATE /DEBUG)
         target_link_options(EngineLib PRIVATE /DEBUG)
         # Optimization properties
         # Release - Enable references, enable COMDAT folding, fast link time code generation
-        target_link_options(Project3 PRIVATE
+        target_link_options(EngineStart PRIVATE
                 $<$<CONFIG:RELEASE>:/OPT:REF /OPT:ICF /LTCG:incremental>
         )
         target_link_options(EngineLib PRIVATE
