@@ -277,11 +277,19 @@ FetchContent_Declare(
         googletest
         URL https://github.com/google/googletest/archive/ff233bdd4cac0a0bf6e5cd45bda3406814cb2796.zip
 )
+FetchContent_Declare(
+        rapidcheck
+        GIT_REPOSITORY https://github.com/emil-e/rapidcheck.git
+        GIT_TAG ff6af6fc683159deb51c543b065eba14dfcf329b
+)
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+set(RC_ENABLE_GTEST ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest rapidcheck)
 
 enable_testing()
+
+# add_subdirectory(${CMAKE_BINARY_DIR}/_deps/rapidcheck-src)
 
 file(GLOB_RECURSE TEST_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Tests/*.cpp"
@@ -294,6 +302,7 @@ target_include_directories(EngineLibTests PRIVATE
 target_link_libraries(EngineLibTests PRIVATE
         EngineLib
         GTest::gtest_main
+        rapidcheck_gtest
 )
 add_dependencies(EngineLibTests EngineLib)
 
