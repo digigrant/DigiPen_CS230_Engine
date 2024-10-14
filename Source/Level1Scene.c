@@ -201,7 +201,7 @@ static void Level1SceneLoad(void)
 static void Level1SceneInit()
 {
 	// Create the planet entity
-	instance.ent_planet = EntityFactoryBuild("./Data/PlanetBounce.txt");
+	instance.ent_planet = EntityFactoryBuild("PlanetBounce");
 	if (instance.ent_planet)
 	{
 		SpriteSetMesh(EntityGetSprite(instance.ent_planet), instance.mesh1x1);
@@ -210,7 +210,7 @@ static void Level1SceneInit()
 	}
 
 	// Create the monkey entity
-	instance.ent_monkey = EntityFactoryBuild("./Data/Monkey.txt");
+	instance.ent_monkey = EntityFactoryBuild("Monkey");
 	if (instance.ent_monkey)
 	{
 		instance.monkeyState = MonkeyInvalid;
@@ -218,7 +218,7 @@ static void Level1SceneInit()
 	}
 
 	// Create the lives display entity
-	instance.ent_lives = EntityFactoryBuild("./Data/MonkeyLivesText.txt");
+	instance.ent_lives = EntityFactoryBuild("MonkeyLivesText");
 	if (instance.ent_lives)
 	{
 		Sprite* spr_lives = EntityGetSprite(instance.ent_lives);

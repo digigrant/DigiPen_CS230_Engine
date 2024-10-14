@@ -15,6 +15,8 @@
 #include "Scene.h"
 #include "SceneSystem.h"
 #include "Trace.h"
+#include "EntityContainer.h"
+#include "EntityFactory.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -35,6 +37,7 @@
 //------------------------------------------------------------------------------
 // Private Variables:
 //------------------------------------------------------------------------------
+static EntityContainer* entities = NULL;
 
 //------------------------------------------------------------------------------
 // Private Function Declarations:
@@ -66,10 +69,9 @@ void SceneLoad(const Scene* scene)
 	// Verify that the function pointer is valid.
 	if (scene && (scene->load != NULL))
 	{
-		// TODO: Call TraceMessage, passing the format string "%s: Load" and the name of the scene.
 		TraceMessage("%s: Load", scene->name);
 
-		// Execute the Load function.
+		entities = EntityContainerCreate(); // Do this before calling the Load function
 		(*scene->load)();
 	}
 }
@@ -80,10 +82,8 @@ void SceneInit(const Scene* scene)
 	// Verify that the function pointer is valid.
 	if (scene && (scene->init != NULL))
 	{
-		// TODO: Call TraceMessage, passing the format string "%s: Init" and the name of the scene.
 		TraceMessage("%s: Init", scene->name);
 
-		// Execute the Init function.
 		(*scene->init)();
 	}
 }
@@ -97,7 +97,7 @@ void SceneUpdate(const Scene* scene, float dt)
 		// TODO: Call TraceMessage, passing the format string "%s: Update" and the name of the scene.
 		TraceMessage("%s: Update", scene->name);
 
-		// Execute the Update function.
+		EntityContainerUpdateAll(entities, dt); // TODO: Should this happen before or after the scene update?
 		(*scene->update)(dt);
 	}
 }
@@ -111,7 +111,7 @@ void SceneRender(const Scene* scene)
 		// TODO: Call TraceMessage, passing the format string "%s: Render" and the name of the scene.
 		TraceMessage("%s: Render", scene->name);
 
-		// Execute the Render function.
+		EntityContainerRenderAll(entities); // TODO: Should this happen before or after the scene render?
 		(*scene->render)();
 	}
 }
@@ -125,8 +125,9 @@ void SceneExit(const Scene* scene)
 		// TODO: Call TraceMessage, passing the format string "%s: Exit" and the name of the scene.
 		TraceMessage("%s: Exit", scene->name);
 
-		// Execute the Exit function.
 		(*scene->exit)();
+		EntityContainerFreeAll(entities); // Do this after calling the Exit function
+		EntityFactoryFreeAll();
 	}
 }
 
@@ -141,6 +142,7 @@ void SceneUnload(const Scene* scene)
 
 		// Execute the Unload function.
 		(*scene->unload)();
+		EntityContainerFree(&entities); // Do this after calling the Unload function
 	}
 }
 
@@ -149,6 +151,16 @@ void SceneRestart(void)
 {
 	// Tell the Scene System to restart the active scene.
 	SceneSystemRestart();
+}
+
+void SceneAddEntity(Entity* entity)
+{
+	// Verify that the function pointer is valid.
+	if (entity)
+	{
+		// Add the entity to the scene.
+		EntityContainerAddEntity(entities, entity);
+	}
 }
 
 //------------------------------------------------------------------------------

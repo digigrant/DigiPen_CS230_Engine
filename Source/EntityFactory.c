@@ -13,6 +13,7 @@
 #include "EntityFactory.h"
 #include "Entity.h"
 #include "Stream.h"
+#include "EntityContainer.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -26,6 +27,8 @@
 // Public Variables:
 //------------------------------------------------------------------------------
 
+static EntityContainer* archetypes = NULL;
+
 //------------------------------------------------------------------------------
 // Private Variables:
 //------------------------------------------------------------------------------
@@ -38,35 +41,54 @@
 // Public Functions:
 //------------------------------------------------------------------------------
 
-Entity* EntityFactoryBuild(char const* filename)
+Entity* EntityFactoryBuild(char const* entityName)
 {
-	// Check if the filename is NULL
-	if (!filename) { return NULL; }
+	if (!entityName) { return NULL; }
 
-	Entity* entity = NULL;
-	Stream stream = StreamOpen(filename);
-
-	// If the stream is valid
-	if (stream)
+	if (!archetypes)
 	{
-		// If the first token is "Entity"
-		if (strncmp(StreamReadToken(stream), "Entity", _countof("Entity")) == 0)
-		{
-			// Create a new entity
-			entity = EntityCreate();
-
-			if (entity)
-			{
-				// Read the entity from the stream
-				EntityRead(entity, stream);
-			}
-		}
-
-		// Close the stream
-		StreamClose(&stream);
+		archetypes = EntityContainerCreate();
 	}
 
+	Entity* entity = EntityContainerFindByName(archetypes, entityName);
+
+	if (!entity)
+	{
+		// Construct the filename
+		char filename[256] = "";
+		sprintf_s(filename, _countof(filename), "./Data/%s.txt", entityName);
+		Stream stream = StreamOpen(filename);
+
+		if (stream)
+		{
+			// If the first token is "Entity"
+			if (strncmp(StreamReadToken(stream), "Entity", _countof("Entity")) == 0)
+			{
+				entity = EntityCreate();
+
+				if (entity)
+				{
+					// Read the entity from the stream
+					EntityRead(entity, stream);
+					//EntityContainerAddEntity(archetypes, entity);
+				}
+			}
+
+			StreamClose(&stream);
+		}
+	}
+
+	// TODO: Clone the archetype entity
+
 	return entity;
+}
+
+void EntityFactoryFreeAll()
+{
+	if (archetypes)
+	{
+		EntityContainerFree(&archetypes);
+	}
 }
 
 //------------------------------------------------------------------------------
