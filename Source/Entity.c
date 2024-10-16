@@ -170,6 +170,11 @@ const char* EntityGetName(const Entity* entity)
 	return (entity) ? entity->name : NULL;
 }
 
+bool EntityIsNamed(const Entity* entity, const char* name)
+{
+	return (entity && name) ? (strcmp(entity->name, name) == 0) : false;
+}
+
 Animation* EntityGetAnimation(const Entity* entity)
 {
 	return (entity) ? entity->animation : NULL;

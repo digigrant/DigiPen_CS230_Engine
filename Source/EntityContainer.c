@@ -99,8 +99,16 @@ bool EntityContainerAddEntity(EntityContainer* entities, Entity* entity)
 
 Entity* EntityContainerFindByName(const EntityContainer* entities, const char* entityName)
 {
-	UNREFERENCED_PARAMETER(entities);
-	UNREFERENCED_PARAMETER(entityName);
+	if (!entities || !entityName) return NULL;
+
+	for (unsigned int i = 0; i < (entities->entityCount); ++i)
+	{
+		if (EntityIsNamed((*entities->entityArray)[i], entityName))
+		{
+			return (*entities->entityArray)[i];
+		}
+	}
+
 	return NULL;
 }
 

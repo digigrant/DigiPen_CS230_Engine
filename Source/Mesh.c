@@ -11,18 +11,22 @@
 
 #include "stdafx.h"
 #include "Mesh.h"
+#include "Stream.h"
 #include "DGL.h"
+#include "Vector2D.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
 //------------------------------------------------------------------------------
+
+#define MAX_NAME_LENGTH 32
 
 //------------------------------------------------------------------------------
 // Private Structures:
 //------------------------------------------------------------------------------
 typedef struct Mesh
 {
-	char name[32];
+	char name[MAX_NAME_LENGTH];
 	DGL_Mesh* mesh_resource;
 	DGL_DrawMode draw_mode;
 } Mesh;
@@ -44,14 +48,11 @@ typedef struct Mesh
 //------------------------------------------------------------------------------
 Mesh* MeshCreate()
 {
-	// returns a pointer to a new Mesh object with all fields initialized to 0
-	// returns NULL if memory allocation fails
-	return (Mesh*)calloc(1, sizeof(Mesh));
+	return (Mesh*)calloc(1, sizeof(Mesh)); // returns NULL if memory allocation fails
 }
 
 void MeshFree(Mesh** mesh)
 {
-	// check if mesh is NULL or *mesh is NULL
 	if (!mesh || !*mesh) return;
 
 	// free mesh resource
@@ -97,6 +98,42 @@ void MeshBuildSpaceship(Mesh* mesh)
 
 	// Draw Mode
 	mesh->draw_mode = DGL_DM_TRIANGLELIST;
+}
+
+void MeshRead(Mesh* mesh, Stream stream)
+{
+	// Read "Mesh"
+	char token[MAX_NAME_LENGTH];
+	strcpy_s(token, _countof(token), StreamReadToken(stream));
+	if (strcmp(token, "Mesh") != 0) return;
+
+	// Read name
+	strcpy_s(mesh->name, _countof(mesh->name), StreamReadToken(stream));
+
+	// Read number of vertices
+	int num_vertices = StreamReadInt(stream);
+
+	// Read vertices
+	DGL_Graphics_StartMesh();
+	for (int i = 0; i < num_vertices; ++i)
+	{
+		Vector2D position, uv;
+		DGL_Color color;
+
+		StreamReadVector2D(stream, &position);
+		StreamReadColor(stream, &color);
+		StreamReadVector2D(stream, &uv);
+		DGL_Graphics_AddVertex(&position, &color, &uv);
+	}
+
+	mesh->mesh_resource = DGL_Graphics_EndMesh();
+
+	mesh->draw_mode = DGL_DM_TRIANGLELIST;
+}
+
+bool MeshIsNamed(const Mesh* mesh, const char* name)
+{
+	return (mesh && name) ? (strcmp(mesh->name, name) == 0) : false;
 }
 
 void MeshRender(const Mesh* mesh)

@@ -155,10 +155,8 @@ void SceneRestart(void)
 
 void SceneAddEntity(Entity* entity)
 {
-	// Verify that the function pointer is valid.
 	if (entity)
 	{
-		// Add the entity to the scene.
 		EntityContainerAddEntity(entities, entity);
 	}
 }
