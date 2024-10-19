@@ -15,6 +15,7 @@
 #include "Trace.h"
 #include "DGL.h"
 #include "Mesh.h"
+#include "MeshLibrary.h"
 #include "Transform.h"
 #include "SpriteSource.h"
 #include "Matrix2D.h"
@@ -80,6 +81,15 @@ void SpriteRead(Sprite* sprite, Stream stream)
 
 	sprite->frameIndex = StreamReadInt(stream);
 	sprite->alpha = StreamReadFloat(stream);
+
+	char name[256] = "";
+	strcpy_s(name, _countof(name), StreamReadToken(stream));
+
+	if (name[0] != '\0' && strcmp(name, "None") != 0)
+	{
+		const Mesh* mesh = MeshLibraryBuild(name);
+		SpriteSetMesh(sprite, mesh);
+	}
 }
 
 void SpriteRender(const Sprite* sprite, Transform* transform)
