@@ -29,6 +29,7 @@ typedef struct Physics
 	Vector2D acceleration;
 	Vector2D velocity;
 	float inverseMass;
+	float rotationalVelocity;
 } Physics;
 
 //------------------------------------------------------------------------------
@@ -62,6 +63,19 @@ Physics* PhysicsCreate(void)
 	return physics;
 }
 
+Physics* PhysicsClone(const Physics* other)
+{
+	if (!other) { return NULL; }
+
+	Physics* physics = (Physics*)malloc(sizeof(Physics));
+	if (physics)
+	{
+		memcpy_s(physics, sizeof(Physics), other, sizeof(Physics));
+	}
+
+	return physics;
+}
+
 void PhysicsFree(Physics** physics)
 {
 	// check if physics is NULL or *physics is NULL
@@ -88,6 +102,11 @@ const Vector2D* PhysicsGetVelocity(const Physics* physics)
 	return (physics) ? &(physics->velocity) : NULL;
 }
 
+float PhysicsGetRotationalVelocity(const Physics* physics)
+{
+	return (physics) ? physics->rotationalVelocity : 0.0f;
+}
+
 const Vector2D* PhysicsGetOldTranslation(Physics* physics)
 {
 	return (physics) ? &(physics->oldTranslation) : NULL;
@@ -101,6 +120,11 @@ void PhysicsSetAcceleration(Physics* physics, const Vector2D* acceleration)
 void PhysicsSetVelocity(Physics* physics, const Vector2D* velocity)
 {
 	physics->velocity = *velocity;
+}
+
+void PhysicsSetRotationalVelocity(Physics* physics, float rotationalVelocity)
+{
+	physics->rotationalVelocity = rotationalVelocity;
 }
 
 void PhysicsUpdate(Physics* physics, Transform* transform, float dt)
@@ -121,6 +145,10 @@ void PhysicsUpdate(Physics* physics, Transform* transform, float dt)
 	Vector2D newTranslation;
 	Vector2DScaleAdd(&newTranslation, &physics->velocity, dt, &physics->oldTranslation);
 	TransformSetTranslation(transform, &newTranslation);
+
+	// update rotation
+	float newrot = TransformGetRotation(transform) + (physics->rotationalVelocity * dt);
+	TransformSetRotation(transform, newrot);
 }
 
 //------------------------------------------------------------------------------

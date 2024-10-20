@@ -75,6 +75,20 @@ Animation* AnimationCreate(void)
 	return animation;
 }
 
+Animation* AnimationClone(const Animation* other)
+{
+	if (!other) { return NULL; }
+	
+	Animation* animation = (Animation*)malloc(sizeof(Animation));
+	if (animation)
+	{
+		memcpy_s(animation, sizeof(Animation), other, sizeof(Animation));
+		// parent pointer needs to be updated - caller is responsible
+	}
+
+	return animation;
+}
+
 void AnimationFree(Animation** animation)
 {
 	if (!animation || !(*animation)) { return; }
