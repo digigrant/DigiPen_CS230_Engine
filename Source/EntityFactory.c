@@ -70,7 +70,7 @@ Entity* EntityFactoryBuild(char const* entityName)
 				{
 					// Read the entity from the stream
 					EntityRead(entity, stream);
-					//EntityContainerAddEntity(archetypes, entity);
+					// TODO: EntityContainerAddEntity(archetypes, entity);
 				}
 			}
 
