@@ -168,13 +168,13 @@ namespace TransformTests
 
 	TEST(TransformUnitTests, TransformClone)
 	{
+		// Set up original
 		Transform* transform = TransformCreate();
 		ASSERT_NE(transform, nullptr);
 
 		Vector2D pos = { 1.0f, 2.0f };
 		float rot = 3.0f;
 		Vector2D scale = { 4.0f, 5.0f };
-
 		TransformSetTranslation(transform, &pos);
 		TransformSetRotation(transform, rot);
 		TransformSetScale(transform, &scale);
@@ -182,6 +182,7 @@ namespace TransformTests
 		// doesnt check matrix - matrix is never calculated. isDirty is true
 
 		Transform* transformClone = TransformClone(transform);
+		ASSERT_NE(transformClone, nullptr);
 		EXPECT_EQ(TransformGetTranslation(transformClone)->x, pos.x);
 		EXPECT_EQ(TransformGetTranslation(transformClone)->y, pos.y);
 		EXPECT_EQ(TransformGetRotation(transformClone), rot);
