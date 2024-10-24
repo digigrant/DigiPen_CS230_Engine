@@ -70,7 +70,7 @@ Entity* EntityFactoryBuild(char const* entityName)
 				{
 					// Read the entity from the stream
 					EntityRead(entity, stream);
-					// TODO: EntityContainerAddEntity(archetypes, entity);
+					EntityContainerAddEntity(archetypes, entity);
 				}
 			}
 
@@ -78,9 +78,8 @@ Entity* EntityFactoryBuild(char const* entityName)
 		}
 	}
 
-	// TODO: Clone the archetype entity
-
-	return entity;
+	Entity* clone = EntityClone(entity);
+	return clone;
 }
 
 void EntityFactoryFreeAll()

@@ -143,11 +143,11 @@ void BehaviorSpaceshipUpdateRotation(Behavior* behavior, float dt)
 
 	if (DGL_Input_KeyDown(VK_LEFT))
 	{
-		PhysicsSetRotationalVelocity(physics, -SPACESHIP_TURN_RATE_MAX);
+		PhysicsSetRotationalVelocity(physics, SPACESHIP_TURN_RATE_MAX);
 	}
 	else if (DGL_Input_KeyDown(VK_RIGHT))
 	{
-		PhysicsSetRotationalVelocity(physics, SPACESHIP_TURN_RATE_MAX);
+		PhysicsSetRotationalVelocity(physics, -SPACESHIP_TURN_RATE_MAX);
 	}
 	else
 	{

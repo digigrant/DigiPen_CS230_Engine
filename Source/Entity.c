@@ -12,10 +12,13 @@
 #include "stdafx.h"
 #include "Entity.h"
 #include "Stream.h"
-#include "Transform.h"
-#include "Sprite.h"
-#include "Physics.h"
 #include "Animation.h"
+#include "Behavior.h"
+#include "BehaviorSpaceship.h"
+#include "BehaviorBullet.h"
+#include "Physics.h"
+#include "Sprite.h"
+#include "Transform.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -31,9 +34,11 @@ typedef struct Entity
 {
 	char name[MAX_NAME_LENGTH];
 	Animation* animation;
-	Transform* transform;
-	Sprite* sprite;
+	Behavior* behavior;
 	Physics* physics;
+	Sprite* sprite;
+	Transform* transform;
+	bool isDestroyed;
 } Entity;
 
 //------------------------------------------------------------------------------
@@ -60,30 +65,70 @@ Entity* EntityCreate(void)
 	return entity;
 }
 
+Entity* EntityClone(const Entity* other)
+{
+	if (!other) { return NULL; }
+
+	Entity* entity = EntityCreate();
+	if (!entity) { return NULL; }
+
+	memcpy_s(entity->name, _countof(entity->name), other->name, _countof(other->name));
+	entity->isDestroyed = other->isDestroyed;
+
+	if (other->animation)
+	{
+		Animation* animation = AnimationClone(other->animation);
+		EntityAddAnimation(entity, animation);
+	}
+	if (other->behavior)
+	{
+		Behavior* behavior = BehaviorClone(other->behavior);
+		EntityAddBehavior(entity, behavior);
+	}
+	if (other->physics)
+	{
+		Physics* physics = PhysicsClone(other->physics);
+		EntityAddPhysics(entity, physics);
+	}
+	if (other->sprite)
+	{
+		Sprite* sprite = SpriteClone(other->sprite);
+		EntityAddSprite(entity, sprite);
+	}
+	if (other->transform)
+	{
+		Transform* transform = TransformClone(other->transform);
+		EntityAddTransform(entity, transform);
+	}
+
+	return entity;
+}
+
 void EntityFree(Entity** entity)
 {
 	// check if entity is NULL or *entity is NULL
 	if (!entity || !*entity) return;
 
 	// free components
-	if ((*entity)->transform)
+	if ((*entity)->animation)
 	{
-		TransformFree(&((*entity)->transform));
+		AnimationFree(&((*entity)->animation));
 	}
-
-	if ((*entity)->sprite)
+	if ((*entity)->behavior)
 	{
-		SpriteFree(&((*entity)->sprite));
+		BehaviorFree(&((*entity)->behavior));
 	}
-
 	if ((*entity)->physics)
 	{
 		PhysicsFree(&((*entity)->physics));
 	}
-
-	if ((*entity)->animation)
+	if ((*entity)->sprite)
 	{
-		AnimationFree(&((*entity)->animation));
+		SpriteFree(&((*entity)->sprite));
+	}
+	if ((*entity)->transform)
+	{
+		TransformFree(&((*entity)->transform));
 	}
 
 	// free entity
@@ -105,30 +150,6 @@ void EntityRead(Entity* entity, Stream stream)
 		// if token is empty, we're done
 		if (strcmp(token, "") == 0) break;
 
-		// Transform component
-		if (strcmp(token, "Transform") == 0)
-		{
-			EntityAddTransform(entity, TransformCreate());
-			TransformRead(entity->transform, stream);
-			continue;
-		}
-
-		// Sprite component
-		if (strcmp(token, "Sprite") == 0)
-		{
-			EntityAddSprite(entity, SpriteCreate());
-			SpriteRead(entity->sprite, stream);
-			continue;
-		}
-
-		// Physics component
-		if (strcmp(token, "Physics") == 0)
-		{
-			EntityAddPhysics(entity, PhysicsCreate());
-			PhysicsRead(entity->physics, stream);
-			continue;
-		}
-
 		// Animation component
 		if (strcmp(token, "Animation") == 0)
 		{
@@ -136,13 +157,63 @@ void EntityRead(Entity* entity, Stream stream)
 			AnimationRead(entity->animation, stream);
 			continue;
 		}
+		// Behavior components
+		if (strcmp(token, "BehaviorSpaceship") == 0)
+		{
+			EntityAddBehavior(entity, BehaviorSpaceshipCreate());
+			BehaviorRead(entity->behavior, stream);
+			continue;
+		}
+		if (strcmp(token, "BehaviorBullet") == 0)
+		{
+			EntityAddBehavior(entity, BehaviorBulletCreate());
+			BehaviorRead(entity->behavior, stream);
+			continue;
+		}
+		// Physics component
+		if (strcmp(token, "Physics") == 0)
+		{
+			EntityAddPhysics(entity, PhysicsCreate());
+			PhysicsRead(entity->physics, stream);
+			continue;
+		}
+		// Sprite component
+		if (strcmp(token, "Sprite") == 0)
+		{
+			EntityAddSprite(entity, SpriteCreate());
+			SpriteRead(entity->sprite, stream);
+			continue;
+		}
+		// Transform component
+		if (strcmp(token, "Transform") == 0)
+		{
+			EntityAddTransform(entity, TransformCreate());
+			TransformRead(entity->transform, stream);
+			continue;
+		}
 	}
+}
+
+void EntityDestroy(Entity* entity)
+{
+	entity->isDestroyed = true;
+}
+
+bool EntityIsDestroyed(const Entity* entity)
+{
+	return (entity) ? entity->isDestroyed : false;
 }
 
 void EntityAddAnimation(Entity* entity, Animation* animation)
 {
 	entity->animation = animation;
 	AnimationSetParent(entity->animation, entity);
+}
+
+void EntityAddBehavior(Entity* entity, Behavior* behavior)
+{
+	entity->behavior = behavior;
+	BehaviorSetParent(entity->behavior, entity);
 }
 
 void EntityAddPhysics(Entity* entity, Physics* physics)
@@ -180,6 +251,11 @@ Animation* EntityGetAnimation(const Entity* entity)
 	return (entity) ? entity->animation : NULL;
 }
 
+Behavior* EntityGetBehavior(const Entity* entity)
+{
+	return (entity) ? entity->behavior : NULL;
+}
+
 Physics* EntityGetPhysics(const Entity* entity)
 {
 	return (entity) ? entity->physics : NULL;
@@ -197,6 +273,12 @@ Transform* EntityGetTransform(const Entity* entity)
 
 void EntityUpdate(Entity* entity, float dt)
 {
+	// Order of update matters!!
+	if (entity->behavior)
+	{
+		BehaviorUpdate(entity->behavior, dt);
+	}
+
 	if (entity->physics && entity->transform)
 	{
 		PhysicsUpdate(entity->physics, entity->transform, dt);
