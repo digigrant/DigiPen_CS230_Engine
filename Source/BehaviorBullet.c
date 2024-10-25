@@ -12,6 +12,7 @@
 #include "stdafx.h"
 #include "BehaviorBullet.h"
 #include "Behavior.h"
+#include "Entity.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -93,7 +94,13 @@ void BehaviorBulletUpdateLifeTimer(Behavior* behavior, float dt)
 {
 	if (!behavior) return;
 
-	if (behavior->timer > 0.0f) { behavior->timer -= dt; } // decrement timer
+	if (behavior->timer > 0.0f)
+	{
+		behavior->timer -= dt; // decrement timer
+	}
 
-	// TODO: destroy bullet if timer is less than or equal to 0.0f
+	if (behavior->timer <= 0.0f)
+	{
+		EntityDestroy(behavior->parent);
+	}
 }

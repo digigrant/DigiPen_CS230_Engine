@@ -156,7 +156,6 @@ void SpriteRender(const Sprite* sprite, Transform* transform)
 			}
 		}
 	}
-
 }
 
 float SpriteGetAlpha(const Sprite* sprite)

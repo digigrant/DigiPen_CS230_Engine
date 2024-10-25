@@ -18,6 +18,7 @@
 #include "Physics.h"
 #include "Vector2D.h"
 #include "DGL.h"
+#include "Scene.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -216,6 +217,6 @@ void BehaviorSpaceshipSpawnBullet(Behavior* behavior)
 	Physics* bullet_physics = EntityGetPhysics(bullet);
 	PhysicsSetVelocity(bullet_physics, &velocity);
 
-	// TODO: add the bullet to the scene
+	SceneAddEntity(bullet);
 }
 
