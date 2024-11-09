@@ -114,7 +114,6 @@ Entity* EntityContainerFindByName(const EntityContainer* entities, const char* e
 
 bool EntityContainerIsEmpty(const EntityContainer* entities)
 {
-	// TODO: What to return if entities is NULL?
 	if (!entities) return true;
 
 	return (entities->entityCount == 0);
@@ -125,6 +124,21 @@ void EntityContainerUpdateAll(EntityContainer* entities, float dt)
 	for (unsigned int i = 0; i < (entities->entityCount); ++i)
 	{
 		EntityUpdate((*entities->entityArray)[i], dt);
+		// If the entity is destroyed, remove it from the list.
+		if (EntityIsDestroyed((*entities->entityArray)[i]))
+		{
+			// Free the entity
+			EntityFree(&(*entities->entityArray)[i]);
+
+			// Move the last entity to the current position to shrink array
+			if (!EntityContainerIsEmpty(entities))
+			{	
+				memcpy_s(&(*entities->entityArray)[i], sizeof(Entity*), &(*entities->entityArray)[entities->entityCount - 1], sizeof(Entity*));
+			}
+
+			--(entities->entityCount);
+			--i;
+		}
 	}
 }
 
