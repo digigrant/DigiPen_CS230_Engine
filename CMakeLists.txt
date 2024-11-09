@@ -66,6 +66,7 @@ add_dependencies(EngineStart EngineLib)
 # -- Entities
 # ---- Components
 # ------ Behavior
+# ------ Coliider
 # ------ Graphics
 # ------ Physics
 # ------ Transform
@@ -82,12 +83,16 @@ file(GLOB ENGINE_ENTITIES_FILES
 file(GLOB ENGINE_ENTITIES_COMPONENTS_BEHAVIOR_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Behavior.*"
 )
+file(GLOB ENGINE_ENTITIES_COMPONENTS_COLLIDER_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/Collider.*"
+)
 file(GLOB ENGINE_ENTITIES_COMPONENTS_GRAPHICS_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Animation.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Mesh.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/MeshLibrary.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Sprite.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/SpriteSource.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/SpriteSourceLibrary.*"
 )
 file(GLOB ENGINE_ENTITIES_COMPONENTS_PHYSICS_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Physics.*"
@@ -106,6 +111,7 @@ file(GLOB ENGINE_ENTITIES_COMPONENTS_TRANSFORM_FILES
 file(GLOB ENGINE_FRAMEWORK_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Engine.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Matrix2D.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/Random.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/stdafx.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Stream.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/targetver.h"
@@ -130,8 +136,11 @@ file(GLOB ENGINE_SYSTEMS_SCENE_FILES
 # -- Systems
 
 file(GLOB GAME_BEHAVIORS_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/BehaviorAsteroid.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/BehaviorBullet.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/BehaviorHudText.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/BehaviorSpaceship.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/Teleporter.*"
 )
 file(GLOB GAME_SCENES_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/AsteroidsScene.*"
@@ -143,6 +152,7 @@ file(GLOB GAME_SCENES_FILES
 )
 file(GLOB GAME_SYSTEMS_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/CheatSystem.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/ScoreSystem.*"
 )
 
 # Add the files to the project
@@ -150,6 +160,7 @@ target_sources(EngineLib PRIVATE
         ${ENGINE_FILES}
         ${ENGINE_ENTITIES_FILES}
         ${ENGINE_ENTITIES_COMPONENTS_BEHAVIOR_FILES}
+        ${ENGINE_ENTITIES_COMPONENTS_COLLIDER_FILES}
         ${ENGINE_ENTITIES_COMPONENTS_GRAPHICS_FILES}
         ${ENGINE_ENTITIES_COMPONENTS_PHYSICS_FILES}
         ${ENGINE_ENTITIES_COMPONENTS_TRANSFORM_FILES}
@@ -166,6 +177,7 @@ target_sources(EngineLib PRIVATE
 source_group("Engine" FILES ${ENGINE_FILES})
 source_group("Engine\\Entities" FILES ${ENGINE_ENTITIES_FILES})
 source_group("Engine\\Entities\\Components\\Behavior" FILES ${ENGINE_ENTITIES_COMPONENTS_BEHAVIOR_FILES})
+source_group("Engine\\Entities\\Components\\Collider" FILES ${ENGINE_ENTITIES_COMPONENTS_COLLIDER_FILES})
 source_group("Engine\\Entities\\Components\\Graphics" FILES ${ENGINE_ENTITIES_COMPONENTS_GRAPHICS_FILES})
 source_group("Engine\\Entities\\Components\\Physics" FILES ${ENGINE_ENTITIES_COMPONENTS_PHYSICS_FILES})
 source_group("Engine\\Entities\\Components\\Transform" FILES ${ENGINE_ENTITIES_COMPONENTS_TRANSFORM_FILES})

@@ -15,4 +15,5 @@ x64/
 Build/
 Trace.log
 bin/
-*.vcxproj.user
+ext/
+*.vcxproj.user\
