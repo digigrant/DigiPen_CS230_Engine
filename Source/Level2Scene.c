@@ -107,7 +107,7 @@ static void Level2SceneLoad(void)
 // Initialize the entities and variables used by the scene.
 static void Level2SceneInit()
 {
-	instance.ent_spaceship = EntityFactoryBuild("./Data/SpaceshipHoming.txt");
+	instance.ent_spaceship = EntityFactoryBuild("SpaceshipHoming");
 
 	if (instance.ent_spaceship)
 	{

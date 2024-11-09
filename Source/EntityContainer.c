@@ -11,6 +11,7 @@
 
 #include "stdafx.h"
 #include "EntityContainer.h"
+#include "Entity.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -24,6 +25,12 @@
 
 typedef struct EntityContainer
 {
+	// This list can be a fixed-length array (minimum size of 100 entries)
+	// or a dynamically sized array, such as a linked list.
+	// (NOTE: The implementation details are left up to the student.  However,
+	//    it is your responsiblity to ensure that memory is handled correctly.)
+	Entity* (*entityArray)[entityArraySize];
+
 	// This variable is not required but could be used for tracking the number
 	//   of Entities currently in the list.  Instructions on how to do this
 	//   are included in the function headers.
@@ -33,12 +40,6 @@ typedef struct EntityContainer
 	// - For storing the maximum size of the container.
 	// - For tracking peak usage of the container, used for testing purposes.
 	unsigned entityMax;
-
-	// This list can be a fixed-length array (minimum size of 100 entries)
-	// or a dynamically sized array, such as a linked list.
-	// (NOTE: The implementation details are left up to the student.  However,
-	//    it is your responsiblity to ensure that memory is handled correctly.)
-	Entity* entities[entityArraySize];
 
 } EntityContainer;
 
@@ -60,48 +61,101 @@ typedef struct EntityContainer
 
 EntityContainer* EntityContainerCreate()
 {
-	return NULL;
+	EntityContainer* ec = (EntityContainer*)calloc(1, sizeof(EntityContainer));
+
+	if (ec)
+	{
+		ec->entityArray = (Entity * (*)[entityArraySize])calloc(entityArraySize, sizeof(Entity*));
+		ec->entityCount = 0;
+		ec->entityMax = entityArraySize;
+	}
+
+	return ec;
 }
 
 void EntityContainerFree(EntityContainer** entities)
 {
-	UNREFERENCED_PARAMETER(entities);
+	if (!entities || !*entities) return;
+
+	// TODO: Do we trust the caller to free all entities first?
+	free((*entities)->entityArray);
+	free(*entities);
+	*entities = NULL;
 }
 
 bool EntityContainerAddEntity(EntityContainer* entities, Entity* entity)
 {
-	UNREFERENCED_PARAMETER(entities);
-	UNREFERENCED_PARAMETER(entity);
+	if (!entities || !entity) return false;
+
+	if (entities->entityCount < entities->entityMax)
+	{
+		(*entities->entityArray)[entities->entityCount] = entity;
+		++(entities->entityCount);
+		return true;
+	}
+
 	return false;
 }
 
 Entity* EntityContainerFindByName(const EntityContainer* entities, const char* entityName)
 {
-	UNREFERENCED_PARAMETER(entities);
-	UNREFERENCED_PARAMETER(entityName);
+	if (!entities || !entityName) return NULL;
+
+	for (unsigned int i = 0; i < (entities->entityCount); ++i)
+	{
+		if (EntityIsNamed((*entities->entityArray)[i], entityName))
+		{
+			return (*entities->entityArray)[i];
+		}
+	}
+
 	return NULL;
 }
 
 bool EntityContainerIsEmpty(const EntityContainer* entities)
 {
-	UNREFERENCED_PARAMETER(entities);
-	return false;
+	if (!entities) return true;
+
+	return (entities->entityCount == 0);
 }
 
 void EntityContainerUpdateAll(EntityContainer* entities, float dt)
 {
-	UNREFERENCED_PARAMETER(entities);
-	UNREFERENCED_PARAMETER(dt);
+	for (unsigned int i = 0; i < (entities->entityCount); ++i)
+	{
+		EntityUpdate((*entities->entityArray)[i], dt);
+		// If the entity is destroyed, remove it from the list.
+		if (EntityIsDestroyed((*entities->entityArray)[i]))
+		{
+			// Free the entity
+			EntityFree(&(*entities->entityArray)[i]);
+
+			// Move the last entity to the current position to shrink array
+			if (!EntityContainerIsEmpty(entities))
+			{	
+				memcpy_s(&(*entities->entityArray)[i], sizeof(Entity*), &(*entities->entityArray)[entities->entityCount - 1], sizeof(Entity*));
+			}
+
+			--(entities->entityCount);
+			--i;
+		}
+	}
 }
 
 void EntityContainerRenderAll(const EntityContainer* entities)
 {
-	UNREFERENCED_PARAMETER(entities);
+	for (unsigned int i = 0; i < (entities->entityCount); ++i)
+	{
+		EntityRender((*entities->entityArray)[i]);
+	}
 }
 
 void EntityContainerFreeAll(EntityContainer* entities)
 {
-	UNREFERENCED_PARAMETER(entities);
+	for (unsigned int i = 0; i < (entities->entityCount); ++i)
+	{
+		EntityFree(&(*entities->entityArray)[i]);
+	}
 }
 
 //------------------------------------------------------------------------------

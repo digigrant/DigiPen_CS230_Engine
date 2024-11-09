@@ -18,6 +18,7 @@
 #include "Scene.h"
 #include "Level1Scene.h"
 #include "Level2Scene.h"
+#include "AsteroidsScene.h"
 #include "DemoScene.h"
 #include "SandboxScene.h"
 #include "SceneSystem.h"
@@ -36,6 +37,7 @@ static const CheatSystemKeyBinding cheatSystemKeyBindings[] =
 {
 	{ '1', Level1SceneGetInstance },
 	{ '2', Level2SceneGetInstance },
+	{ '3', AsteroidsSceneGetInstance },
 	{ '9', SandboxSceneGetInstance },
 	{ '0', DemoSceneGetInstance }
 };

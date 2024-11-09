@@ -67,6 +67,19 @@ Transform* TransformCreate(void)
 	return transform;
 }
 
+Transform* TransformClone(const Transform* other)
+{
+	if (!other) { return NULL; }
+
+	Transform* transform = (Transform*)malloc(sizeof(Transform));
+	if (transform)
+	{
+		memcpy_s(transform, sizeof(Transform), other, sizeof(Transform));
+	}
+
+	return transform;
+}
+
 void TransformFree(Transform** transform)
 {
 	// Check if the transform is NULL

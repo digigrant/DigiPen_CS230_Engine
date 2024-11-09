@@ -166,6 +166,65 @@ namespace TransformTests
 		TransformFree(&transform);
 	}
 
+	TEST(TransformUnitTests, TransformClone)
+	{
+		// Set up original
+		Transform* transform = TransformCreate();
+		ASSERT_NE(transform, nullptr);
+
+		Vector2D pos = { 1.0f, 2.0f };
+		float rot = 3.0f;
+		Vector2D scale = { 4.0f, 5.0f };
+		TransformSetTranslation(transform, &pos);
+		TransformSetRotation(transform, rot);
+		TransformSetScale(transform, &scale);
+
+		// doesnt check matrix - matrix is never calculated. isDirty is true
+
+		Transform* transformClone = TransformClone(transform);
+		ASSERT_NE(transformClone, nullptr);
+		EXPECT_EQ(TransformGetTranslation(transformClone)->x, pos.x);
+		EXPECT_EQ(TransformGetTranslation(transformClone)->y, pos.y);
+		EXPECT_EQ(TransformGetRotation(transformClone), rot);
+		EXPECT_EQ(TransformGetScale(transformClone)->x, scale.x);
+		EXPECT_EQ(TransformGetScale(transformClone)->y, scale.y);
+
+		Vector2D newpos_orig, newpos_clone, newscale_orig, newscale_clone;
+		float newrot_orig, newrot_clone;
+		Vector2DScale(&newpos_orig, &pos, 5.0f);
+		Vector2DScale(&newpos_clone, &pos, 10.0f);
+		newrot_orig = rot * 5.0f;
+		newrot_clone = rot * 10.0f;
+		Vector2DScale(&newscale_orig, &scale, 5.0f);
+		Vector2DScale(&newscale_clone, &scale, 10.0f);
+
+		TransformSetTranslation(transform, &newpos_orig);
+		TransformSetRotation(transform, newrot_orig);
+		TransformSetScale(transform, &newscale_orig);
+		TransformSetTranslation(transformClone, &newpos_clone);
+		TransformSetRotation(transformClone, newrot_clone);
+		TransformSetScale(transformClone, &newscale_clone);
+
+		EXPECT_EQ(TransformGetTranslation(transform)->x, newpos_orig.x);
+		EXPECT_EQ(TransformGetTranslation(transform)->y, newpos_orig.y);
+		EXPECT_EQ(TransformGetRotation(transform), newrot_orig);
+		EXPECT_EQ(TransformGetScale(transform)->x, newscale_orig.x);
+		EXPECT_EQ(TransformGetScale(transform)->y, newscale_orig.y);
+
+		EXPECT_EQ(TransformGetTranslation(transformClone)->x, newpos_clone.x);
+		EXPECT_EQ(TransformGetTranslation(transformClone)->y, newpos_clone.y);
+		EXPECT_EQ(TransformGetRotation(transformClone), newrot_clone);
+		EXPECT_EQ(TransformGetScale(transformClone)->x, newscale_clone.x);
+		EXPECT_EQ(TransformGetScale(transformClone)->y, newscale_clone.y);
+
+		TransformFree(&transform);
+		EXPECT_EQ(transform, nullptr);
+		EXPECT_NE(transformClone, nullptr);
+		TransformFree(&transformClone);
+		ASSERT_EQ(transformClone, nullptr);
+
+	}
+
 	/*
 	TEST(TransformMemberTests, GetMatrix)
 	{

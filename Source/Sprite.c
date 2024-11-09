@@ -15,6 +15,7 @@
 #include "Trace.h"
 #include "DGL.h"
 #include "Mesh.h"
+#include "MeshLibrary.h"
 #include "Transform.h"
 #include "SpriteSource.h"
 #include "Matrix2D.h"
@@ -66,6 +67,21 @@ Sprite* SpriteCreate(void)
 	return sprite;
 }
 
+Sprite* SpriteClone(const Sprite* other)
+{
+	if (!other) { return NULL; }
+
+	Sprite* sprite = (Sprite*)malloc(sizeof(Sprite));
+	if (sprite)
+	{
+		// shallow copy! pointers are copied as is!
+		// sprite_source, mesh, text - all const, should be ok
+		memcpy_s(sprite, sizeof(Sprite), other, sizeof(Sprite));
+	}
+
+	return sprite;
+}
+
 void SpriteFree(Sprite** sprite)
 {
 	if (!sprite || !(*sprite)) { return; }
@@ -80,6 +96,15 @@ void SpriteRead(Sprite* sprite, Stream stream)
 
 	sprite->frameIndex = StreamReadInt(stream);
 	sprite->alpha = StreamReadFloat(stream);
+
+	char name[256] = "";
+	strcpy_s(name, _countof(name), StreamReadToken(stream));
+
+	if (name[0] != '\0' && strcmp(name, "None") != 0)
+	{
+		const Mesh* mesh = MeshLibraryBuild(name);
+		SpriteSetMesh(sprite, mesh);
+	}
 }
 
 void SpriteRender(const Sprite* sprite, Transform* transform)
@@ -131,7 +156,6 @@ void SpriteRender(const Sprite* sprite, Transform* transform)
 			}
 		}
 	}
-
 }
 
 float SpriteGetAlpha(const Sprite* sprite)

@@ -14,6 +14,9 @@
 #include "Scene.h"
 #include "SceneSystem.h"
 #include "AsteroidsScene.h"
+#include "DGL.h"
+#include "Entity.h"
+#include "EntityFactory.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -87,6 +90,14 @@ static void AsteroidsSceneLoad(void)
 // Initialize the entities and variables used by the scene.
 static void AsteroidsSceneInit()
 {
+	Entity* ent_spaceship = EntityFactoryBuild("Spaceship");
+	if (ent_spaceship)
+	{
+		SceneAddEntity(ent_spaceship);
+	}
+
+	DGL_Graphics_SetBackgroundColor(&(DGL_Color) { 0.0f, 0.0f, 0.0f, 1.0f });
+	DGL_Graphics_SetBlendMode(DGL_BM_BLEND);
 }
 
 // Update the the variables used by the scene.
@@ -96,10 +107,6 @@ static void AsteroidsSceneUpdate(float dt)
 {
 	// Tell the compiler that the 'dt' variable is unused.
 	UNREFERENCED_PARAMETER(dt);
-
-	// NOTE: This call causes the engine to exit immediately.  Make sure to remove
-	//   it when you are ready to test out a new scene.
-	SceneSystemSetNext(NULL);
 }
 
 // Render any objects associated with the scene.

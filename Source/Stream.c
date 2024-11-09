@@ -104,6 +104,14 @@ void StreamReadVector2D(Stream stream, Vector2D* v)
 	fscanf_s(stream, "%f %f", &v->x, &v->y);
 }
 
+void StreamReadColor(Stream stream, DGL_Color* color)
+{
+	// Check if the stream or color is NULL
+	if (!stream || !color) return;
+
+	fscanf_s(stream, "%f %f %f %f", &color->r, &color->g, &color->b, &color->a);
+}
+
 const char* StreamReadToken(Stream stream)
 {
 	// Check if the stream is NULL
