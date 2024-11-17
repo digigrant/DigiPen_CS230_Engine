@@ -22,6 +22,9 @@
 // Private Constants:
 //------------------------------------------------------------------------------
 
+static const unsigned cAsteroidsSpawnInitial = 8;
+static const unsigned cAsteroidsSpawnMaximum = 20;
+
 //------------------------------------------------------------------------------
 // Private Structures:
 //------------------------------------------------------------------------------
@@ -32,6 +35,7 @@ typedef struct AsteroidsScene
 	Scene	base;
 
 	// Add any scene-specific variables second.
+	unsigned asteroidSpawnCount;
 
 } AsteroidsScene;
 
@@ -53,6 +57,8 @@ static void AsteroidsSceneUpdate(float dt);
 static void AsteroidsSceneExit(void);
 static void AsteroidsSceneUnload(void);
 static void AsteroidsSceneRender(void);
+static void AsteroidsSceneSpawnAsteroidWave(void);
+static void AsteroidsSceneSpawnAsteroid(void);
 
 //------------------------------------------------------------------------------
 // Instance Variable:

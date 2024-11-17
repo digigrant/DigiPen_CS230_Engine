@@ -131,6 +131,18 @@ bool EntityContainerIsEmpty(const EntityContainer* entities);
 //	 dt = Change in time (in seconds) since the last game loop.
 void EntityContainerUpdateAll(EntityContainer* entities, float dt);
 
+// Check for collisions between all Entities in the EntityContainer.
+// (HINT: Only check for collisions between Entities that contain a Collider.)
+// (NOTE: There must never be more than 1 collision check between any two
+//    Entities in the container.  Additionally, each Entity must never
+//    check for a collision with itself.  To ensure this is the case, each time
+//    an Entity with a Collider is found, check for collisions against only the
+//    remaining Entities in the list (starting with the Entity following the
+//    current Entity.)
+// Params:
+//   entities = Pointer to the EntityContainer.
+void EntityContainerCheckCollisions(EntityContainer* entities);
+
 // Render all Entities in the EntityContainer.
 // (HINT: You must call EntityRender for all Entities.)
 // Params:

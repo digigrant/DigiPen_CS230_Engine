@@ -1,69 +1,70 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	EntityFactory.h
-// Author(s):	Doug Schilling (dschilling)
-// Project:		Project 4
+// File Name:	BehaviorHudText.c
+// Author(s):	Grant Joyner (g.joyner)
+// Project:		Project 5
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
 //
 //------------------------------------------------------------------------------
 
-#pragma once
+#include "stdafx.h"
+#include "BehaviorHudText.h"
+#include "Behavior.h"
+#include "Stream.h"
+#include "ScoreSystem.h"
 
 //------------------------------------------------------------------------------
-// Include Files:
+// Private Constants:
 //------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-
-#ifdef __cplusplus
-extern "C" {
-	/* Assume C declarations for C++ */
-#endif
-
-//------------------------------------------------------------------------------
-// Forward References:
-//------------------------------------------------------------------------------
-
-typedef struct Entity Entity;
+typedef enum HudTextStates
+{
+	cHudTextInvalid = -1,
+	cHudTextIdle
+} HudTextStates;
 
 //------------------------------------------------------------------------------
-// Public Consts:
+// Private Structures:
 //------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-// Public Structures:
-//------------------------------------------------------------------------------
+typedef struct BehaviorHudText
+{
+	Behavior base;
+	ScoreSystemId scoreSystemId; // Should be ScoreSystemId
+	char format[32];
+	char displayString[32];
+	unsigned displayValue;
+} BehaviorHudText;
 
 //------------------------------------------------------------------------------
 // Public Variables:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
+// Private Variables:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Private Function Declarations:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Build a single instance of the specified Entity.
-// (NOTE: Use sprintf_s() to construct a path name using objectName.)
-// (HINT: The correct path name should be constructed using "Data/%s.txt".)
-// (HINT: See project instructions.)
-// Params:
-//	 entityName = The name of the Entity to be constructed.
-// Returns:
-//	 If the objectName is not NULL,
-//	   then return a pointer to a new instance of the specified Entity,
-//	   else NULL.
-Entity* EntityFactoryBuild(const char * entityName);
+Behavior* BehaviorHudTextCreate(void)
+{
+	return NULL;
+}
 
-// Free all archetype Entities.
-// (Hint: If the "archetypes" container exists, then the EntityContainerFreeAll
-//    function must be called.)
-void EntityFactoryFreeAll();
+void BehaviorHudTextRead(Behavior* behavior, Stream stream)
+{
+	UNREFERENCED_PARAMETER(behavior);
+	UNREFERENCED_PARAMETER(stream);
+}
 
 //------------------------------------------------------------------------------
-
-#ifdef __cplusplus
-}                       /* End of extern "C" { */
-#endif
-
+// Private Functions:
+//------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 //
 // File Name:	Entity.h
 // Author(s):	Doug Schilling (dschilling)
-// Project:		Project 4
+// Project:		Project 5
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
@@ -28,6 +28,7 @@ extern "C" {
 
 typedef struct Animation Animation;
 typedef struct Behavior Behavior;
+typedef struct Collider Collider;
 typedef struct Entity Entity;
 typedef struct Physics Physics;
 typedef struct Sprite Sprite;
@@ -69,6 +70,9 @@ typedef struct Entity
 
 	// Pointer to an attached Behavior component.
 	Behavior* behavior;
+
+	// Pointer to an attached Collider component.
+	Collider* collider;
 
 	// Pointer to an attached Physics component.
 	Physics* physics;
@@ -145,20 +149,28 @@ void EntityDestroy(Entity* entity);
 bool EntityIsDestroyed(const Entity* entity);
 
 // Attach an Animation component to an Entity.
-// (NOTE: This function must set the animation component's parent pointer by
-//	  calling the AnimationSetParent() function.)
+// (NOTE: This function must also set the animation component's parent pointer
+//	  by calling the AnimationSetParent() function.)
 // Params:
 //	 entity = Pointer to the Entity.
 //   animation = Pointer to the Animation component to be attached.
 void EntityAddAnimation(Entity* entity, Animation* animation);
 
 // Attach a Behavior component to an Entity.
-// (NOTE: This function must set the Behavior component's parent pointer by
-//	  calling the BehaviorSetParent() function.)
+// (NOTE: This function must also set the Behavior component's parent pointer
+//	  by calling the BehaviorSetParent() function.)
 // Params:
 //	 entity = Pointer to the Entity.
 //   behavior = Pointer to the Behavior component to be attached.
 void EntityAddBehavior(Entity* entity, Behavior* behavior);
+
+// Attach a Collider component to an Entity.
+// (NOTE: This function must also set the Collider component's parent pointer
+//	  by calling the ColliderSetParent() function.)
+// Params:
+//	 entity = Pointer to the Entity.
+//   collider = Pointer to the Collider component to be attached.
+void EntityAddCollider(Entity* entity, Collider* collider);
 
 // Attach a Physics component to an Entity.
 // Params:
@@ -226,6 +238,15 @@ Animation* EntityGetAnimation(const Entity* entity);
 //		else return NULL.
 Behavior* EntityGetBehavior(const Entity* entity);
 
+// Get the Collider component attached to an Entity.
+// Params:
+//	 entity = Pointer to the Entity.
+// Returns:
+//	 If the Entity pointer is valid,
+//		then return a pointer to the attached Collider component,
+//		else return NULL.
+Collider* EntityGetCollider(const Entity* entity);
+
 // Get the Physics component attached to an Entity.
 // Params:
 //	 entity = Pointer to the Entity.
@@ -254,8 +275,10 @@ Sprite* EntityGetSprite(const Entity* entity);
 Transform* EntityGetTransform(const Entity* entity);
 
 // Update any components attached to the Entity.
-// (Hint: You will need to call PhysicsUpdate().)
 // (NOTE: You must first check for a valid pointer before calling this function.)
+// (HINT: Update the Animation first, as it might affect Behavior.)
+// (HINT: Update the Behavior second, as it might affect Physics.)
+// (HINT: Update the Physics last, before checking for collisions.)
 // Params:
 //	 entity = Pointer to the Entity.
 //	 dt = Change in time (in seconds) since the last game loop.

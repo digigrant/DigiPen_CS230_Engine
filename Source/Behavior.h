@@ -50,14 +50,19 @@ typedef struct Behavior
 	// Pointer to the behavior's parent entity.
 	Entity* parent;
 
-	// Behavior Finite-State Machine (FSM) function pointers.
-	BehaviorFunctionPtr		onInit;
-	BehaviorFunctionPtrDt	onUpdate;
-	BehaviorFunctionPtr		onExit;
+	// The following variable is used to allocate the correct amount of memory
+	//   when cloning a behavior component.  Cloning of "derived" behaviors will
+	//   fail if insufficient memory is allocated.
+	unsigned int memorySize;
 
 	// Behavior Finite-State Machine (FSM) state variables.
 	int stateCurr;
 	int stateNext;
+
+		// Behavior Finite-State Machine (FSM) function pointers.
+	BehaviorFunctionPtr		onInit;
+	BehaviorFunctionPtrDt	onUpdate;
+	BehaviorFunctionPtr		onExit;
 
 	// Additional variables shared by all behaviors.
 	// NOTE: Variables that are unique to a specific behavior should not be placed here.

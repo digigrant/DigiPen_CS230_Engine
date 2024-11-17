@@ -1,69 +1,88 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	EntityFactory.h
-// Author(s):	Doug Schilling (dschilling)
-// Project:		Project 4
+// File Name:	Collider.c
+// Author(s):	Grant Joyner (g.joyner)
+// Project:		Project 5
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
 //
 //------------------------------------------------------------------------------
 
-#pragma once
+#include "stdafx.h"
+#include "Collider.h"
 
 //------------------------------------------------------------------------------
-// Include Files:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-
-#ifdef __cplusplus
-extern "C" {
-	/* Assume C declarations for C++ */
-#endif
-
-//------------------------------------------------------------------------------
-// Forward References:
-//------------------------------------------------------------------------------
-
-typedef struct Entity Entity;
-
-//------------------------------------------------------------------------------
-// Public Consts:
+// Private Constants:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-// Public Structures:
+// Private Structures:
 //------------------------------------------------------------------------------
+typedef struct Collider
+{
+	Entity* parent;
+	CollisionEventHandler handler;
+} Collider;
 
 //------------------------------------------------------------------------------
 // Public Variables:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
+// Private Variables:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Private Function Declarations:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Build a single instance of the specified Entity.
-// (NOTE: Use sprintf_s() to construct a path name using objectName.)
-// (HINT: The correct path name should be constructed using "Data/%s.txt".)
-// (HINT: See project instructions.)
-// Params:
-//	 entityName = The name of the Entity to be constructed.
-// Returns:
-//	 If the objectName is not NULL,
-//	   then return a pointer to a new instance of the specified Entity,
-//	   else NULL.
-Entity* EntityFactoryBuild(const char * entityName);
+// Initialize the ...
+Collider* ColliderCreate(void)
+{
+	return NULL;
+}
 
-// Free all archetype Entities.
-// (Hint: If the "archetypes" container exists, then the EntityContainerFreeAll
-//    function must be called.)
-void EntityFactoryFreeAll();
+Collider* ColliderClone(const Collider* other)
+{
+	UNREFERENCED_PARAMETER(other);
+	return NULL;
+}
+
+void ColliderFree(Collider** collider)
+{
+	UNREFERENCED_PARAMETER(collider);
+}
+
+void ColliderRead(Collider* collider, Stream stream)
+{
+	UNREFERENCED_PARAMETER(collider);
+	UNREFERENCED_PARAMETER(stream);
+}
+
+void ColliderSetParent(Collider* collider, Entity* parent)
+{
+	UNREFERENCED_PARAMETER(collider);
+	UNREFERENCED_PARAMETER(parent);
+}
+
+void ColliderCheck(Collider* collider, Collider* other)
+{
+	UNREFERENCED_PARAMETER(collider);
+	UNREFERENCED_PARAMETER(other);
+}
+
+void ColliderSetHandler(Collider* collider, CollisionEventHandler handler)
+{
+	UNREFERENCED_PARAMETER(collider);
+	UNREFERENCED_PARAMETER(handler);
+}
 
 //------------------------------------------------------------------------------
-
-#ifdef __cplusplus
-}                       /* End of extern "C" { */
-#endif
+// Private Functions:
+//------------------------------------------------------------------------------
 
