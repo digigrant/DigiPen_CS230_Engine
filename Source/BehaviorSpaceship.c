@@ -19,6 +19,7 @@
 #include "Vector2D.h"
 #include "DGL.h"
 #include "Scene.h"
+#include "Teleporter.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -128,6 +129,8 @@ void BehaviorSpaceshipOnUpdate(Behavior* behavior, float dt)
 	default:
 		break;
 	}
+
+	TeleporterUpdateEntity(behavior->parent);
 }
 
 void BehaviorSpaceshipOnExit(Behavior* behavior)

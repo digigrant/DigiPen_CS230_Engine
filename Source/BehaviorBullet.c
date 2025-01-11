@@ -13,6 +13,7 @@
 #include "BehaviorBullet.h"
 #include "Behavior.h"
 #include "Entity.h"
+#include "Teleporter.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -83,6 +84,8 @@ void BehaviorBulletOnUpdate(Behavior* behavior, float dt)
 		BehaviorBulletUpdateLifeTimer(behavior, dt);
 		break;
 	}
+
+	TeleporterUpdateEntity(behavior->parent);
 }
 
 void BehaviorBulletOnExit(Behavior* behavior)
