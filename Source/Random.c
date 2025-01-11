@@ -11,6 +11,7 @@
 
 #include "stdafx.h"
 #include "Random.h"
+#include <time.h>
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -39,20 +40,23 @@
 // Initialize the ...
 void RandomInit()
 {
+	// Use current time
+	// TODO: make this parameterized
+	srand((unsigned int)time(NULL));
 }
 
 int RandomRange(int rangeMin, int rangeMax)
 {
-	UNREFERENCED_PARAMETER(rangeMin);
-	UNREFERENCED_PARAMETER(rangeMax);
-	return 0;
+	// (float)rand() / (RAND_MAX + 1) generates a random number between 0 and 1 (exclusive)
+	// Multiply by the range and add the minimum to get a random number in the desired range
+	return (int)((float)rand() / (RAND_MAX + 1) * (rangeMax - rangeMin + 1) + rangeMin);
 }
 
 float RandomRangeFloat(float rangeMin, float rangeMax)
 {
-	UNREFERENCED_PARAMETER(rangeMin);
-	UNREFERENCED_PARAMETER(rangeMax);
-	return 0.0f;
+	// (float)rand() / (RAND_MAX) generates a random number between 0 and 1 (inclusive)
+	// Multiply by the range and add the minimum to get a random number in the desired range
+	return ((float)rand() / (RAND_MAX) * (rangeMax - rangeMin) + rangeMin);
 }
 
 //------------------------------------------------------------------------------
