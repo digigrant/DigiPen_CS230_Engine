@@ -76,7 +76,7 @@ void ColliderCheck(Collider* collider, Collider* other)
 	UNREFERENCED_PARAMETER(other);
 }
 
-void ColliderSetHandler(Collider* collider, CollisionEventHandler handler)
+void ColliderSetCollisionHandler(Collider* collider, CollisionEventHandler handler)
 {
 	UNREFERENCED_PARAMETER(collider);
 	UNREFERENCED_PARAMETER(handler);
