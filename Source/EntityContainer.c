@@ -77,7 +77,12 @@ void EntityContainerFree(EntityContainer** entities)
 {
 	if (!entities || !*entities) return;
 
-	// TODO: Do we trust the caller to free all entities first?
+	// Free all entities in the container if needed
+	if ((*entities)->entityCount > 0)
+	{
+		EntityContainerFreeAll(*entities);
+	}
+
 	free((*entities)->entityArray);
 	free(*entities);
 	*entities = NULL;
@@ -86,15 +91,12 @@ void EntityContainerFree(EntityContainer** entities)
 bool EntityContainerAddEntity(EntityContainer* entities, Entity* entity)
 {
 	if (!entities || !entity) return false;
+	// Check if the container is full
+	if (entities->entityCount >= entities->entityMax) return false;
 
-	if (entities->entityCount < entities->entityMax)
-	{
-		(*entities->entityArray)[entities->entityCount] = entity;
-		++(entities->entityCount);
-		return true;
-	}
-
-	return false;
+	(*entities->entityArray)[entities->entityCount] = entity;
+	++(entities->entityCount);
+	return true;
 }
 
 Entity* EntityContainerFindByName(const EntityContainer* entities, const char* entityName)
@@ -114,7 +116,7 @@ Entity* EntityContainerFindByName(const EntityContainer* entities, const char* e
 
 bool EntityContainerIsEmpty(const EntityContainer* entities)
 {
-	if (!entities) return true;
+	if (!entities) return false;
 
 	return (entities->entityCount == 0);
 }
@@ -156,6 +158,7 @@ void EntityContainerFreeAll(EntityContainer* entities)
 	{
 		EntityFree(&(*entities->entityArray)[i]);
 	}
+	entities->entityCount = 0;
 }
 
 //------------------------------------------------------------------------------
