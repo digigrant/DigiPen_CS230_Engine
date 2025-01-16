@@ -102,6 +102,12 @@ static void AsteroidsSceneInit()
 		SceneAddEntity(ent_spaceship);
 	}
 
+	Entity* ent_asteroid = EntityFactoryBuild("Asteroid");
+	if (ent_asteroid)
+	{
+		SceneAddEntity(ent_asteroid);
+	}
+
 	DGL_Graphics_SetBackgroundColor(&(DGL_Color) { 0.0f, 0.0f, 0.0f, 1.0f });
 	DGL_Graphics_SetBlendMode(DGL_BM_BLEND);
 }

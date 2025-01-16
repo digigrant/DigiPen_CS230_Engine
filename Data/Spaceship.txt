@@ -11,6 +11,7 @@ Sprite
 0
 1
 MeshSpaceship
+None
 BehaviorSpaceship
 -1
 0

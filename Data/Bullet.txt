@@ -11,6 +11,7 @@ Sprite
 0
 1
 MeshBullet
+None
 BehaviorBullet
 -1
 0

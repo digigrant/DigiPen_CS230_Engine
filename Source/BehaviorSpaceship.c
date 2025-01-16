@@ -76,6 +76,7 @@ Behavior* BehaviorSpaceshipCreate(void)
 
 	if (!behavior) return NULL;
 
+	behavior->memorySize = sizeof(Behavior);
 	behavior->stateCurr = SPACESHIP_INVALID;
 	behavior->stateNext = SPACESHIP_INVALID;
 	behavior->onInit = BehaviorSpaceshipOnInit;

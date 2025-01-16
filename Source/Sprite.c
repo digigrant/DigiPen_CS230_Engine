@@ -98,13 +98,24 @@ void SpriteRead(Sprite* sprite, Stream stream)
 	sprite->alpha = StreamReadFloat(stream);
 
 	char name[256] = "";
-	strcpy_s(name, _countof(name), StreamReadToken(stream));
 
+	// mesh name
+	strcpy_s(name, _countof(name), StreamReadToken(stream));
 	if (name[0] != '\0' && strcmp(name, "None") != 0)
 	{
 		const Mesh* mesh = MeshLibraryBuild(name);
 		SpriteSetMesh(sprite, mesh);
 	}
+
+	// sprite source name
+	strcpy_s(name, _countof(name), StreamReadToken(stream));
+	/* TODO:
+	if (name[0] != '\0' && strcmp(name, "None") != 0)
+	{
+		const SpriteSource* spriteSource = SpriteSourceBuild(name);
+		SpriteSetSpriteSource(sprite, spriteSource);
+	}
+	*/
 }
 
 void SpriteRender(const Sprite* sprite, Transform* transform)

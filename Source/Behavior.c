@@ -41,18 +41,10 @@ Behavior* BehaviorClone(Behavior* other)
 {
 	if (!other) return NULL;
 
-	Behavior* behavior = (Behavior*)malloc(sizeof(Behavior));
-
+	Behavior* behavior = (Behavior*)malloc(other->memorySize);
 	if (!behavior) return NULL;
 
-	behavior->stateCurr = other->stateCurr;
-	behavior->stateNext = other->stateNext;
-	behavior->timer = other->timer;
-	behavior->onInit = other->onInit;
-	behavior->onUpdate = other->onUpdate;
-	behavior->onExit = other->onExit;
-	behavior->parent = other->parent;	// caller must set parent
-
+	memcpy(behavior, other, other->memorySize);
 	return behavior;
 }
 
@@ -61,7 +53,7 @@ void BehaviorFree(Behavior** behavior)
 	if (!behavior || !(*behavior)) return;
 
 	free(*behavior);
-	*behavior = NULL;
+	(*behavior) = NULL;
 }
 
 void BehaviorRead(Behavior* behavior, Stream stream)

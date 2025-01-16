@@ -14,8 +14,10 @@
 #include "Stream.h"
 #include "Animation.h"
 #include "Behavior.h"
-#include "BehaviorSpaceship.h"
+#include "BehaviorAsteroid.h"
 #include "BehaviorBullet.h"
+#include "BehaviorSpaceship.h"
+#include "Collider.h"
 #include "Physics.h"
 #include "Sprite.h"
 #include "Transform.h"
@@ -158,9 +160,9 @@ void EntityRead(Entity* entity, Stream stream)
 			continue;
 		}
 		// Behavior components
-		if (strcmp(token, "BehaviorSpaceship") == 0)
+		if (strcmp(token, "BehaviorAsteroid") == 0)
 		{
-			EntityAddBehavior(entity, BehaviorSpaceshipCreate());
+			EntityAddBehavior(entity, BehaviorAsteroidCreate());
 			BehaviorRead(entity->behavior, stream);
 			continue;
 		}
@@ -168,6 +170,19 @@ void EntityRead(Entity* entity, Stream stream)
 		{
 			EntityAddBehavior(entity, BehaviorBulletCreate());
 			BehaviorRead(entity->behavior, stream);
+			continue;
+		}
+		if (strcmp(token, "BehaviorSpaceship") == 0)
+		{
+			EntityAddBehavior(entity, BehaviorSpaceshipCreate());
+			BehaviorRead(entity->behavior, stream);
+			continue;
+		}
+		// Collider component
+		if (strcmp(token, "Collider") == 0)
+		{
+			// EntityAddCollider(entity, ColliderCreate());
+			// ColliderRead(entity->collider, stream);
 			continue;
 		}
 		// Physics component

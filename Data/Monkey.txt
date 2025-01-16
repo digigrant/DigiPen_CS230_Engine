@@ -11,6 +11,7 @@ Sprite
 0
 1
 None
+None
 Animation
 0
 0
