@@ -12,6 +12,7 @@
 #include "stdafx.h"
 #include "EntityContainer.h"
 #include "Entity.h"
+#include "Collider.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -140,6 +141,23 @@ void EntityContainerUpdateAll(EntityContainer* entities, float dt)
 
 			--(entities->entityCount);
 			--i;
+		}
+	}
+}
+
+void EntityContainerCheckCollisions(EntityContainer* entities)
+{
+	for (unsigned int i = 0; i < (entities->entityCount); ++i)
+	{
+		Collider* colliderA = EntityGetCollider((*entities->entityArray)[i]);
+		if (!colliderA) continue;
+
+		for (unsigned int j = i + 1; j < (entities->entityCount); ++j)
+		{
+			Collider* colliderB = EntityGetCollider((*entities->entityArray)[j]);
+			if (!colliderB) continue;
+
+			ColliderCheck(colliderA, colliderB);
 		}
 	}
 }

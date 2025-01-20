@@ -37,6 +37,7 @@ typedef struct Entity
 	char name[MAX_NAME_LENGTH];
 	Animation* animation;
 	Behavior* behavior;
+	Collider* collider;
 	Physics* physics;
 	Sprite* sprite;
 	Transform* transform;
@@ -87,6 +88,11 @@ Entity* EntityClone(const Entity* other)
 		Behavior* behavior = BehaviorClone(other->behavior);
 		EntityAddBehavior(entity, behavior);
 	}
+	if (other->collider)
+	{
+		Collider* collider = ColliderClone(other->collider);
+		EntityAddCollider(entity, collider);
+	}
 	if (other->physics)
 	{
 		Physics* physics = PhysicsClone(other->physics);
@@ -119,6 +125,10 @@ void EntityFree(Entity** entity)
 	if ((*entity)->behavior)
 	{
 		BehaviorFree(&((*entity)->behavior));
+	}
+	if ((*entity)->collider)
+	{
+		ColliderFree(&((*entity)->collider));
 	}
 	if ((*entity)->physics)
 	{
@@ -181,8 +191,8 @@ void EntityRead(Entity* entity, Stream stream)
 		// Collider component
 		if (strcmp(token, "Collider") == 0)
 		{
-			// EntityAddCollider(entity, ColliderCreate());
-			// ColliderRead(entity->collider, stream);
+			EntityAddCollider(entity, ColliderCreate());
+			ColliderRead(entity->collider, stream); // Currently doesnt do anything
 			continue;
 		}
 		// Physics component
@@ -222,13 +232,19 @@ bool EntityIsDestroyed(const Entity* entity)
 void EntityAddAnimation(Entity* entity, Animation* animation)
 {
 	entity->animation = animation;
-	AnimationSetParent(entity->animation, entity);
+	AnimationSetParent(animation, entity);
 }
 
 void EntityAddBehavior(Entity* entity, Behavior* behavior)
 {
 	entity->behavior = behavior;
-	BehaviorSetParent(entity->behavior, entity);
+	BehaviorSetParent(behavior, entity);
+}
+
+void EntityAddCollider(Entity* entity, Collider* collider)
+{
+	entity->collider = collider;
+	ColliderSetParent(collider, entity);
 }
 
 void EntityAddPhysics(Entity* entity, Physics* physics)
@@ -269,6 +285,11 @@ Animation* EntityGetAnimation(const Entity* entity)
 Behavior* EntityGetBehavior(const Entity* entity)
 {
 	return (entity) ? entity->behavior : NULL;
+}
+
+Collider* EntityGetCollider(const Entity* entity)
+{
+	return (entity) ? entity->collider : NULL;
 }
 
 Physics* EntityGetPhysics(const Entity* entity)

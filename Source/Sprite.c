@@ -72,13 +72,9 @@ Sprite* SpriteClone(const Sprite* other)
 	if (!other) { return NULL; }
 
 	Sprite* sprite = (Sprite*)malloc(sizeof(Sprite));
-	if (sprite)
-	{
-		// shallow copy! pointers are copied as is!
-		// sprite_source, mesh, text - all const, should be ok
-		memcpy_s(sprite, sizeof(Sprite), other, sizeof(Sprite));
-	}
-
+	if (!sprite) { return NULL; }
+	
+	memcpy_s(sprite, sizeof(Sprite), other, sizeof(Sprite));
 	return sprite;
 }
 

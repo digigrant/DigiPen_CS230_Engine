@@ -14,6 +14,7 @@
 #include "Behavior.h"
 #include "Entity.h"
 #include "Teleporter.h"
+#include "Collider.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -45,6 +46,7 @@ static void BehaviorBulletOnInit(Behavior* behavior);
 static void BehaviorBulletOnUpdate(Behavior* behavior, float dt);
 static void BehaviorBulletOnExit(Behavior* behavior);
 static void BehaviorBulletUpdateLifeTimer(Behavior* behavior, float dt);
+static void BehaviorBulletCollisionHandler(Entity* bullet, Entity* other);
 
 //------------------------------------------------------------------------------
 // Public Functions:
@@ -72,7 +74,16 @@ Behavior* BehaviorBulletCreate(void)
 
 void BehaviorBulletOnInit(Behavior* behavior)
 {
-	UNREFERENCED_PARAMETER(behavior);
+	if (!behavior) return;
+
+	if (behavior->stateCurr == BULLET_IDLE)
+	{
+		Collider* collider = EntityGetCollider(behavior->parent);
+		if (collider)
+		{
+			ColliderSetCollisionHandler(collider, BehaviorBulletCollisionHandler);
+		}
+	}
 }
 
 void BehaviorBulletOnUpdate(Behavior* behavior, float dt)
@@ -106,5 +117,15 @@ void BehaviorBulletUpdateLifeTimer(Behavior* behavior, float dt)
 	if (behavior->timer <= 0.0f)
 	{
 		EntityDestroy(behavior->parent);
+	}
+}
+
+void BehaviorBulletCollisionHandler(Entity* bullet, Entity* other)
+{
+	if (!bullet || !other) return;
+
+	if (strcmp(EntityGetName(other), "Asteroid") == 0)
+	{
+		EntityDestroy(bullet);
 	}
 }

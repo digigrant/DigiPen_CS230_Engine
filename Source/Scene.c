@@ -99,8 +99,9 @@ void SceneUpdate(const Scene* scene, float dt)
 		// TODO: Call TraceMessage, passing the format string "%s: Update" and the name of the scene.
 		TraceMessage("%s: Update", scene->name);
 
-		EntityContainerUpdateAll(entities, dt); // TODO: Should this happen before or after the scene update?
 		(*scene->update)(dt);
+		EntityContainerUpdateAll(entities, dt);
+		EntityContainerCheckCollisions(entities);
 	}
 }
 

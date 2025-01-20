@@ -70,7 +70,7 @@ static void BehaviorAsteroidOnUpdate(Behavior* behavior, float dt);
 static void BehaviorAsteroidOnExit(Behavior* behavior);
 static void BehaviorAsteroidSetPosition(BehaviorAsteroid*);
 static void BehaviorAsteroidSetVelocity(BehaviorAsteroid*);
-//static void BehaviorAsteroidCollisionHandler(Entity* entity, const Entity* other);
+static void BehaviorAsteroidCollisionHandler(Entity* asteroid, const Entity* other);
 
 //------------------------------------------------------------------------------
 // Public Functions:
@@ -104,10 +104,12 @@ void BehaviorAsteroidOnInit(Behavior* behavior)
 		asteroid->origin = (AsteroidOrigin)RandomRange(0, ASTEROID_ORIGIN_COUNT - 1);
 		BehaviorAsteroidSetPosition(asteroid);
 		BehaviorAsteroidSetVelocity(asteroid);
-		// Collider* collider = EntityGetCollider(behavior->entity);
-		// if (collider) {
-		// 	collider->onCollision = BehaviorAsteroidCollisionHandler;
-		// }
+
+		Collider* collider = EntityGetCollider(asteroid->base.parent);
+		if (collider)
+		{
+			ColliderSetCollisionHandler(collider, BehaviorAsteroidCollisionHandler);
+		}
 	}
 }
 
@@ -196,10 +198,12 @@ void BehaviorAsteroidSetVelocity(BehaviorAsteroid* behavior)
 	PhysicsSetVelocity(physics, &velocity);
 }
 
-/*
-void BehaviorAsteroidCollisionHandler(Entity* entity, const Entity* other)
+void BehaviorAsteroidCollisionHandler(Entity* asteroid, const Entity* other)
 {
-	UNREFERENCED_PARAMETER(entity);
-	UNREFERENCED_PARAMETER(other);
+	if (!asteroid || !other) return;
+	// add points to the board
+	if (strcmp(EntityGetName(other), "Bullet") == 0)
+	{
+		EntityDestroy(asteroid);
+	}
 }
-*/
