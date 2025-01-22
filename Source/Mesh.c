@@ -105,30 +105,40 @@ void MeshRead(Mesh* mesh, Stream stream)
 	// Read "Mesh"
 	char token[MAX_NAME_LENGTH];
 	strcpy_s(token, _countof(token), StreamReadToken(stream));
-	if (strcmp(token, "Mesh") != 0) return;
-
-	// Read name
-	strcpy_s(mesh->name, _countof(mesh->name), StreamReadToken(stream));
-
-	// Read number of vertices
-	int num_vertices = StreamReadInt(stream);
-
-	// Read vertices
-	DGL_Graphics_StartMesh();
-	for (int i = 0; i < num_vertices; ++i)
+	if (strcmp(token, "Mesh") == 0)
 	{
-		Vector2D position, uv;
-		DGL_Color color;
+		// Read name
+		strcpy_s(mesh->name, _countof(mesh->name), StreamReadToken(stream));
 
-		StreamReadVector2D(stream, &position);
-		StreamReadColor(stream, &color);
-		StreamReadVector2D(stream, &uv);
-		DGL_Graphics_AddVertex(&position, &color, &uv);
+		// Read number of vertices
+		int num_vertices = StreamReadInt(stream);
+
+		// Read vertices
+		DGL_Graphics_StartMesh();
+		for (int i = 0; i < num_vertices; ++i)
+		{
+			Vector2D position, uv;
+			DGL_Color color;
+
+			StreamReadVector2D(stream, &position);
+			StreamReadColor(stream, &color);
+			StreamReadVector2D(stream, &uv);
+			DGL_Graphics_AddVertex(&position, &color, &uv);
+		}
+
+		mesh->mesh_resource = DGL_Graphics_EndMesh();
+
+		mesh->draw_mode = DGL_DM_TRIANGLELIST;
 	}
-
-	mesh->mesh_resource = DGL_Graphics_EndMesh();
-
-	mesh->draw_mode = DGL_DM_TRIANGLELIST;
+	else if (strcmp(token, "Quad") == 0)
+	{
+		float xHalfSize = StreamReadFloat(stream);
+		float yHalfSize = StreamReadFloat(stream);
+		float uSize = StreamReadFloat(stream);
+		float vSize = StreamReadFloat(stream);
+		strcpy_s(token, _countof(token), StreamReadToken(stream));
+		MeshBuildQuad(mesh, xHalfSize, yHalfSize, uSize, vSize, token);
+	}
 }
 
 bool MeshIsNamed(const Mesh* mesh, const char* name)

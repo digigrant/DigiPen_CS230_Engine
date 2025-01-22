@@ -12,6 +12,7 @@
 #include "stdafx.h"
 #include "SpriteSource.h"
 #include "DGL.h"
+#include "Stream.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -23,9 +24,9 @@
 
 typedef struct SpriteSource
 {
+	char name[32];
 	// Pointer to a texture resource created using the DigiPen Graphics Library (DGL).
 	const DGL_Texture* texture;
-
 	// The dimensions of the sprite sheet.
 	// (Hint: These should be initialized to (1, 1).)
 	int	num_rows;
@@ -92,6 +93,25 @@ void SpriteSourceLoadTexture(SpriteSource* spriteSource, int numCols, int numRow
 	// set num_rows and num_cols
 	spriteSource->num_rows = numRows;
 	spriteSource->num_cols = numCols;
+}
+
+void SpriteSourceRead(SpriteSource* spriteSource, Stream stream)
+{
+	char buffer[256];
+	strcpy(buffer, StreamReadToken(stream));
+	if (strcmp(buffer, "SpriteSource") == 0)
+	{
+		strcpy(spriteSource->name, StreamReadToken(stream));
+		spriteSource->num_cols = StreamReadInt(stream);
+		spriteSource->num_rows = StreamReadInt(stream);
+		strcpy(buffer, StreamReadToken(stream)); // we should probably do some validation on the filename but fuck it
+		spriteSource->texture = DGL_Graphics_LoadTexture(&buffer);
+	}
+}
+
+bool SpriteSourceIsNamed(const SpriteSource* spriteSource, const char* name)
+{
+	return (spriteSource && name) ? (strcmp(spriteSource->name, name) == 0) : false;
 }
 
 unsigned SpriteSourceGetFrameCount(const SpriteSource* spriteSource)
