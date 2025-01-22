@@ -98,14 +98,14 @@ void SpriteSourceLoadTexture(SpriteSource* spriteSource, int numCols, int numRow
 void SpriteSourceRead(SpriteSource* spriteSource, Stream stream)
 {
 	char buffer[256];
-	strcpy(buffer, StreamReadToken(stream));
+	strcpy_s(buffer, _countof(buffer), StreamReadToken(stream));
 	if (strcmp(buffer, "SpriteSource") == 0)
 	{
-		strcpy(spriteSource->name, StreamReadToken(stream));
+		strcpy_s(spriteSource->name, _countof(spriteSource->name), StreamReadToken(stream));
 		spriteSource->num_cols = StreamReadInt(stream);
 		spriteSource->num_rows = StreamReadInt(stream);
-		strcpy(buffer, StreamReadToken(stream)); // we should probably do some validation on the filename but fuck it
-		spriteSource->texture = DGL_Graphics_LoadTexture(&buffer);
+		strcpy_s(buffer, _countof(buffer), StreamReadToken(stream)); // we should probably do some validation on the filename but fuck it
+		spriteSource->texture = DGL_Graphics_LoadTexture(buffer);
 	}
 }
 

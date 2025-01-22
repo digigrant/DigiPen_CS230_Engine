@@ -26,7 +26,7 @@
 
 typedef struct SpriteSourceLibrary
 {
-	SpriteSource* spriteSourceList[SPRITE_SOURCE_LIST_SIZE];
+	const SpriteSource* spriteSourceList[SPRITE_SOURCE_LIST_SIZE];
 	unsigned int spriteSourceCount;
 } SpriteSourceLibrary;
 
@@ -69,7 +69,7 @@ const SpriteSource* SpriteSourceLibraryBuild(const char* spriteSourceName)
 	if (!spriteSource)
 	{
 		char filename[256];
-		sprintf(filename, "Data/%s.txt", spriteSourceName);
+		sprintf_s(filename, _countof(filename), "Data/%s.txt", spriteSourceName);
 		Stream stream = StreamOpen(filename);
 
 		if (stream)
