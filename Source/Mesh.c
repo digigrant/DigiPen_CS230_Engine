@@ -134,8 +134,8 @@ void MeshRead(Mesh* mesh, Stream stream)
 	{
 		float xHalfSize = StreamReadFloat(stream);
 		float yHalfSize = StreamReadFloat(stream);
-		float uSize = StreamReadFloat(stream);
-		float vSize = StreamReadFloat(stream);
+		float uSize = 1.0f / StreamReadFloat(stream);
+		float vSize = 1.0f / StreamReadFloat(stream);
 		strcpy_s(token, _countof(token), StreamReadToken(stream));
 		MeshBuildQuad(mesh, xHalfSize, yHalfSize, uSize, vSize, token);
 	}

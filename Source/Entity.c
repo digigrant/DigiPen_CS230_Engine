@@ -21,6 +21,7 @@
 #include "Physics.h"
 #include "Sprite.h"
 #include "Transform.h"
+#include "BehaviorHudText.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -186,6 +187,12 @@ void EntityRead(Entity* entity, Stream stream)
 		{
 			EntityAddBehavior(entity, BehaviorSpaceshipCreate());
 			BehaviorRead(entity->behavior, stream);
+			continue;
+		}
+		if (strcmp(token, "BehaviorHudText") == 0)
+		{
+			EntityAddBehavior(entity, BehaviorHudTextCreate());
+			BehaviorHudTextRead(entity->behavior, stream);
 			continue;
 		}
 		// Collider component

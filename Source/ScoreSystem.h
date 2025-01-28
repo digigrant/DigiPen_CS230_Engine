@@ -33,11 +33,11 @@ typedef struct BaseSystem BaseSystem;
 
 typedef enum
 {
-	SsiInvalid = -1,
-	SsiScore = 0,
-	SsiHighScore,
-	SsiWaveCount,
-	SsiMax,
+	SCORE_SYSTEM_ID_INVALID = -1,
+	SCORE_SYSTEM_ID_SCORE = 0,
+	SCORE_SYSTEM_ID_HIGH_SCORE,
+	SCORE_SYSTEM_ID_WAVE_COUNT,
+	SCORE_SYSTEM_ID_MAX,
 } ScoreSystemId;
 
 //------------------------------------------------------------------------------

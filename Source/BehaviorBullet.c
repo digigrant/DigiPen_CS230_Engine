@@ -56,7 +56,7 @@ static void BehaviorBulletCollisionHandler(Entity* bullet, Entity* other);
 Behavior* BehaviorBulletCreate(void)
 {
 	Behavior* behavior = (Behavior*)calloc(1, sizeof(Behavior));
-	if (!behavior) return NULL;
+	if (!behavior) { return NULL; }
 
 	behavior->memorySize = sizeof(Behavior);
 	behavior->stateCurr = BULLET_INVALID;

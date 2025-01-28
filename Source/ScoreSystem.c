@@ -28,7 +28,9 @@ typedef struct ScoreSystem
 	// WARNING: The base class must always be included first.
 	BaseSystem	base;
 
-	// Add any system-specific variables second.
+	unsigned score;
+	unsigned high_score;
+	unsigned wave_count;
 
 } ScoreSystem;
 
@@ -40,7 +42,6 @@ typedef struct ScoreSystem
 // Private Function Declarations:
 //------------------------------------------------------------------------------
 
-//  System-specific State functions:
 static bool ScoreSystemInit(void);
 static void ScoreSystemUpdate(float dt);
 static void ScoreSystemRender(void);
@@ -59,71 +60,72 @@ static ScoreSystem instance =
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Get the instance of the Stub System.
-// Returns:
-//	 Pointer to the abstract BaseSystem for this derived System.
 BaseSystem* ScoreSystemGetInstance()
 {
-	// Initialize any system-specific variables here:
-
-	// Return a reference to the instance of this system.
 	return (BaseSystem*)&instance;
 }
 
 void ScoreSystemClear(void)
 {
+	instance.score = 0;
+	instance.high_score = 0;
+	instance.wave_count = 0;
 }
 
 void ScoreSystemReset(void)
 {
+	if (instance.score > instance.high_score)
+	{
+		instance.high_score = instance.score;
+	}
+
+	instance.score = 0;
+	instance.wave_count = 0;
 }
 
 unsigned ScoreSystemGetValue(ScoreSystemId valueId)
 {
-	UNREFERENCED_PARAMETER(valueId);
-	return 0;
+	switch (valueId)
+	{
+	case SCORE_SYSTEM_ID_SCORE:
+		return instance.score;
+	case SCORE_SYSTEM_ID_HIGH_SCORE:
+		return instance.high_score;
+	case SCORE_SYSTEM_ID_WAVE_COUNT:
+		return instance.wave_count;
+	default:
+		return 0;
+	}
 }
 
 void ScoreSystemIncreaseScore(unsigned amount)
 {
-	UNREFERENCED_PARAMETER(amount);
+	instance.score += amount;
 }
 
 void ScoreSystemIncreaseWave(void)
 {
+	instance.wave_count++;
 }
 
 //------------------------------------------------------------------------------
 // Private Functions:
 //------------------------------------------------------------------------------
 
-// Initialize the Stub System.
-// Returns:
-//   Return "true" if the system was initialized successfully, otherwise return "false".
 static bool ScoreSystemInit(void)
 {
-	// Return false if the system was NOT initialized successfully.
-
-	// Return true if the system was initialized successfully.
 	return true;
 }
 
-// Update the Stub System.
-// Params:
-//	 dt = Change in time (in seconds) since the last game loop.
 static void ScoreSystemUpdate(float dt)
 {
-	// Tell the compiler that the 'dt' variable is unused.
 	UNREFERENCED_PARAMETER(dt);
 }
 
-// Render any objects associated with the Stub System.
 static void ScoreSystemRender(void)
 {
 }
 
-// Shutdown the Stub System.
-//   (HINT: Free any allocated resources and/or close any opened files).
 static void ScoreSystemExit(void)
 {
 }

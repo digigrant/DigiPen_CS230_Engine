@@ -20,6 +20,7 @@
 #include "Vector2D.h"
 #include "Transform.h"
 #include "Physics.h"
+#include "ScoreSystem.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -79,11 +80,10 @@ static void BehaviorAsteroidCollisionHandler(Entity* asteroid, const Entity* oth
 Behavior* BehaviorAsteroidCreate(void)
 {
 	BehaviorAsteroid* behavior = (BehaviorAsteroid*)calloc(1, sizeof(BehaviorAsteroid));
-	if (!behavior) return NULL;
+	if (!behavior) { return NULL; }
 
 	behavior->base.stateCurr = ASTEROID_INVALID;
 	behavior->base.memorySize = sizeof(BehaviorAsteroid);
-	// behavior->origin = cAsteroidOriginTlc;
 	behavior->base.onInit = BehaviorAsteroidOnInit;
 	behavior->base.onUpdate = BehaviorAsteroidOnUpdate;
 	behavior->base.onExit = BehaviorAsteroidOnExit;
@@ -204,6 +204,7 @@ void BehaviorAsteroidCollisionHandler(Entity* asteroid, const Entity* other)
 	// add points to the board
 	if (strcmp(EntityGetName(other), "Bullet") == 0)
 	{
+		ScoreSystemIncreaseScore(20);
 		EntityDestroy(asteroid);
 	}
 }
