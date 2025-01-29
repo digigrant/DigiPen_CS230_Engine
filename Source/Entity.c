@@ -198,9 +198,11 @@ void EntityRead(Entity* entity, Stream stream)
 		// Collider component
 		if (strcmp(token, "Collider") == 0)
 		{
+			/*
 			EntityAddCollider(entity, ColliderCreate());
 			ColliderRead(entity->collider, stream); // Currently doesnt do anything
 			continue;
+			*/
 		}
 		// Physics component
 		if (strcmp(token, "Physics") == 0)

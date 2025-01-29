@@ -2,7 +2,7 @@
 //
 // File Name:	Collider.h
 // Author(s):	Doug Schilling (dschilling)
-// Project:		Project 5
+// Project:		Project 6
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
@@ -34,24 +34,38 @@ typedef FILE* Stream;
 // Public Consts:
 //------------------------------------------------------------------------------
 
+typedef enum ColliderType
+{
+	ColliderTypeNone,
+	ColliderTypeCircle,
+	ColliderTypeLine,
+
+} ColliderType;
+
 //------------------------------------------------------------------------------
 // Public Structures:
 //------------------------------------------------------------------------------
 
 typedef void(*CollisionEventHandler)(Entity* entity1, Entity* entity2);
 
-// An example of the structure to be defined in Collider.c.
-#if 0
+// This structure must now be declared publicly so that it may be included in
+//   the private ColliderCircle and ColliderLine structures.
 typedef struct Collider
 {
 	// Pointer to the collider's parent Entity.
 	Entity* parent;
 
-	// Pointer to a function that handles collisions between two objects.
+	// The type of collider used by this component.
+	// (Currently, Circle or Line).
+	ColliderType type;
+
+	// Pointer to a function that handles collisions between entities.
 	CollisionEventHandler	handler;
 
+	// The amount of memory to be allocated when cloning a component of this type.
+	unsigned int	memorySize;
+
 } Collider;
-#endif
 
 //------------------------------------------------------------------------------
 // Public Variables:
@@ -60,10 +74,6 @@ typedef struct Collider
 //------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
-
-// Dynamically allocate a new Collider component.
-// (Hint: Use calloc() to ensure that all member variables are initialized to 0.)
-Collider* ColliderCreate(void);
 
 // Dynamically allocate a clone of an existing Collider component.
 // (Hint: Perform a shallow copy of the member variables.)
@@ -76,17 +86,10 @@ Collider* ColliderCreate(void);
 Collider* ColliderClone(const Collider* other);
 
 // Free the memory associated with a Collider component.
-// (Also, set the collider pointer to NULL.)
+// (NOTE: The Collider pointer must be set to NULL.)
 // Params:
-//	 collider = Pointer to the Collider component.
+//	 collider = Pointer to the Collider pointer.
 void ColliderFree(Collider** collider);
-
-// Read the properties of a Collider component from a file.
-// [NOTE: No values need to be read at this time.]
-// Params:
-//	 collider = Pointer to the Collider component.
-//	 stream = Pointer to the data stream used for reading.
-void ColliderRead(Collider* collider, Stream stream);
 
 // Set the parent Entity for a Collider component.
 // Params:
@@ -101,9 +104,9 @@ void ColliderSetParent(Collider* collider, Entity* parent);
 // Params:
 //	 collider = Pointer to the first Collider component.
 //	 other = Pointer to the second Collider component.
-void ColliderCheck(Collider* collider, Collider* other);
+void ColliderCheck(const Collider* collider, const Collider* other);
 
-// Set the collision event handler for a collider.
+// Set the collision event handler for when two entities collide.
 // (Hint: This allows other components, such as Behaviors, to respond to collision events.)
 // (Note: It is acceptable for the handler to be NULL.  This allows an existing handler to be removed.)
 // Params:

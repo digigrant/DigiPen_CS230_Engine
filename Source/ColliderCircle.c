@@ -1,72 +1,66 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	CheatSystem.h
-// Author(s):	Doug Schilling (dschilling)
-// Project:		Project 6
+// File Name:	ColliderCircle.c
+// Author(s):	Grant Joyner (g.joyner)
+// Project:		Project 0
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
 //
 //------------------------------------------------------------------------------
 
-#pragma once
+#include "stdafx.h"
+#include "ColliderCircle.h"
 
 //------------------------------------------------------------------------------
-// Include Files:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-
-#ifdef __cplusplus
-extern "C" {	// Assume C declarations for C++.
-#endif
-
-//------------------------------------------------------------------------------
-// Forward References:
-//------------------------------------------------------------------------------
-
-typedef struct BaseSystem BaseSystem;
-
-//------------------------------------------------------------------------------
-// Public Constants:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Typedefs:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Structures:
+// Private Constants:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // Private Structures:
 //------------------------------------------------------------------------------
 
-// An example of the structure to be defined in CheatSystem.c.
-#if 0
-typedef struct
-{
-	char key;
-	const Scene* (*getInstance)(void);
-
-} CheatSystemKeyBinding;
-#endif
-
 //------------------------------------------------------------------------------
 // Public Variables:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Private Variables:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Private Function Declarations:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Get the instance of the Stub System.
-BaseSystem* CheatSystemGetInstance(void);
+Collider* ColliderCircleCreate()
+{
+	return NULL;
+}
 
-/*----------------------------------------------------------------------------*/
+void ColliderCircleRead(Collider* collider, Stream stream)
+{
+	UNREFERENCED_PARAMETER(collider);
+	UNREFERENCED_PARAMETER(stream);
+}
 
-#ifdef __cplusplus
-}                       // End of extern "C" {
-#endif
+float ColliderCircleGetRadius(const Collider* collider)
+{
+	UNREFERENCED_PARAMETER(collider);
+	return 0.0f;
+}
+
+bool ColliderCircleIsCollidingWithCircle(const Collider* collider, const Collider* other)
+{
+	UNREFERENCED_PARAMETER(collider);
+	UNREFERENCED_PARAMETER(other);
+	return false;
+}
+
+//------------------------------------------------------------------------------
+// Private Functions:
+//------------------------------------------------------------------------------
 

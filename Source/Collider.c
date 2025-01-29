@@ -23,11 +23,6 @@
 //------------------------------------------------------------------------------
 // Private Structures:
 //------------------------------------------------------------------------------
-typedef struct Collider
-{
-	Entity* parent;
-	CollisionEventHandler handler;
-} Collider;
 
 //------------------------------------------------------------------------------
 // Public Variables:
@@ -46,10 +41,12 @@ typedef struct Collider
 //------------------------------------------------------------------------------
 
 // Initialize the ...
+/*
 Collider* ColliderCreate(void)
 {
 	return (Collider*)calloc(1, sizeof(Collider));
 }
+*/
 
 Collider* ColliderClone(const Collider* other)
 {
@@ -82,7 +79,7 @@ void ColliderSetParent(Collider* collider, Entity* parent)
 	collider->parent = parent;
 }
 
-void ColliderCheck(Collider* collider, Collider* other)
+void ColliderCheck(const Collider* collider, const Collider* other)
 {
 	if (!collider || !other) { return; }
 

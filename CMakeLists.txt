@@ -85,6 +85,8 @@ file(GLOB ENGINE_ENTITIES_COMPONENTS_BEHAVIOR_FILES
 )
 file(GLOB ENGINE_ENTITIES_COMPONENTS_COLLIDER_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Collider.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/ColliderCircle.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/ColliderLine.*"
 )
 file(GLOB ENGINE_ENTITIES_COMPONENTS_GRAPHICS_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Animation.*"
@@ -147,6 +149,7 @@ file(GLOB GAME_SCENES_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/DemoScene.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Level1Scene.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/Level2Scene.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Source/OmegaScene.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/SandboxScene.*"
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/StubScene.*"
 )

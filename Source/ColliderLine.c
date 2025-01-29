@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	CheatSystem.h
-// Author(s):	Doug Schilling (dschilling)
+// File Name:	ColliderLine.c
+// Author(s):	Grant Joyner (g.joyner)
 // Project:		Project 6
 // Course:		CS230S24
 //
@@ -9,64 +9,59 @@
 //
 //------------------------------------------------------------------------------
 
-#pragma once
+#include "stdafx.h"
+#include "ColliderLine.h"
 
 //------------------------------------------------------------------------------
-// Include Files:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-
-#ifdef __cplusplus
-extern "C" {	// Assume C declarations for C++.
-#endif
-
-//------------------------------------------------------------------------------
-// Forward References:
-//------------------------------------------------------------------------------
-
-typedef struct BaseSystem BaseSystem;
-
-//------------------------------------------------------------------------------
-// Public Constants:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Typedefs:
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Public Structures:
+// Private Constants:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // Private Structures:
 //------------------------------------------------------------------------------
 
-// An example of the structure to be defined in CheatSystem.c.
-#if 0
-typedef struct
-{
-	char key;
-	const Scene* (*getInstance)(void);
-
-} CheatSystemKeyBinding;
-#endif
-
 //------------------------------------------------------------------------------
 // Public Variables:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Private Variables:
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Private Function Declarations:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Get the instance of the Stub System.
-BaseSystem* CheatSystemGetInstance(void);
+Collider* ColliderLineCreate()
+{
+	return NULL;
+}
 
-/*----------------------------------------------------------------------------*/
+void ColliderLineRead(Collider* collider, Stream stream)
+{
+	UNREFERENCED_PARAMETER(collider);
+	UNREFERENCED_PARAMETER(stream);
+}
 
-#ifdef __cplusplus
-}                       // End of extern "C" {
-#endif
+void ColliderLineAddLineSegment(Collider* collider, const Vector2D* p0, const Vector2D* p1)
+{
+	UNREFERENCED_PARAMETER(collider);
+	UNREFERENCED_PARAMETER(p0);
+	UNREFERENCED_PARAMETER(p1);
+}
+
+bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider* other)
+{
+	UNREFERENCED_PARAMETER(collider);
+	UNREFERENCED_PARAMETER(other);
+	return false;
+}
+
+//------------------------------------------------------------------------------
+// Private Functions:
+//------------------------------------------------------------------------------
 
