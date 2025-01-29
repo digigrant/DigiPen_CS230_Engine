@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	EntityFactory.h
+// File Name:	Random.h
 // Author(s):	Doug Schilling (dschilling)
-// Project:		Project 4
+// Project:		Project 5
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
@@ -26,8 +26,6 @@ extern "C" {
 // Forward References:
 //------------------------------------------------------------------------------
 
-typedef struct Entity Entity;
-
 //------------------------------------------------------------------------------
 // Public Consts:
 //------------------------------------------------------------------------------
@@ -44,22 +42,28 @@ typedef struct Entity Entity;
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Build a single instance of the specified Entity.
-// (NOTE: Use sprintf_s() to construct a path name using objectName.)
-// (HINT: The correct path name should be constructed using "Data/%s.txt".)
-// (HINT: See project instructions.)
-// Params:
-//	 entityName = The name of the Entity to be constructed.
-// Returns:
-//	 If the objectName is not NULL,
-//	   then return a pointer to a new instance of the specified Entity,
-//	   else NULL.
-Entity* EntityFactoryBuild(const char * entityName);
+// Initialize the pseudorandom number generator (PRNG).
+// You may use the example code from
+//	 https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/rand.
+// However, if you do so, then you must cite this source within the .c file.
+void RandomInit();
 
-// Free all archetype Entities.
-// (Hint: If the "archetypes" container exists, then the EntityContainerFreeAll
-//    function must be called.)
-void EntityFactoryFreeAll();
+// Generate a random number in the interval [rangeMin, rangeMax] (inclusive).
+// You may use the example code from
+//	 https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/rand.
+// However, if you do so, then you must cite this source within the .c file.
+// Params:
+//	 rangeMin = The lowest possible number generated.
+//	 rangeMax = The highest possible number generated.
+// Returns:
+//   A random number in the interval [rangeMin, rangeMax].
+int RandomRange(int rangeMin, int rangeMax);
+
+// Generate a random floating-point number in the interval [rangeMin, rangeMax] (inclusive).
+// Params:
+//	 rangeMin = The lowest possible number generated.
+//	 rangeMax = The highest possible number generated.
+float RandomRangeFloat(float rangeMin, float rangeMax);
 
 //------------------------------------------------------------------------------
 

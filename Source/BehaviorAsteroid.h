@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	EntityFactory.h
+// File Name:	BehaviorAsteroid.h
 // Author(s):	Doug Schilling (dschilling)
-// Project:		Project 4
+// Project:		Project 5
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
@@ -26,15 +26,41 @@ extern "C" {
 // Forward References:
 //------------------------------------------------------------------------------
 
-typedef struct Entity Entity;
+typedef struct Behavior Behavior;
 
 //------------------------------------------------------------------------------
 // Public Consts:
 //------------------------------------------------------------------------------
 
+// An example of the enum to be defined in BehaviorAsteroid.c.
+#if 0
+typedef enum
+{
+	cAsteroidOriginTlc,
+	cAsteroidOriginTrc,
+	cAsteroidOriginBlc,
+	cAsteroidOriginBrc,
+	cAsteroidOriginCount,
+
+} AsteroidOrigin;
+#endif
+
 //------------------------------------------------------------------------------
 // Public Structures:
 //------------------------------------------------------------------------------
+
+// An example of the structure to be defined in BehaviorAsteroid.c.
+#if 0
+typedef struct BehaviorAsteroid
+{
+	// Inherit the base behavior structure.
+	Behavior	base;
+
+	// Add asteroid-specific behavior variables.
+	AsteroidOrigin	origin;
+
+} BehaviorAsteroid;
+#endif
 
 //------------------------------------------------------------------------------
 // Public Variables:
@@ -44,22 +70,9 @@ typedef struct Entity Entity;
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Build a single instance of the specified Entity.
-// (NOTE: Use sprintf_s() to construct a path name using objectName.)
-// (HINT: The correct path name should be constructed using "Data/%s.txt".)
-// (HINT: See project instructions.)
-// Params:
-//	 entityName = The name of the Entity to be constructed.
-// Returns:
-//	 If the objectName is not NULL,
-//	   then return a pointer to a new instance of the specified Entity,
-//	   else NULL.
-Entity* EntityFactoryBuild(const char * entityName);
-
-// Free all archetype Entities.
-// (Hint: If the "archetypes" container exists, then the EntityContainerFreeAll
-//    function must be called.)
-void EntityFactoryFreeAll();
+// Dynamically allocate a new (Asteroid) behavior component.
+// (Hint: Use calloc() to ensure that all member variables are initialized to 0.)
+Behavior* BehaviorAsteroidCreate(void);
 
 //------------------------------------------------------------------------------
 

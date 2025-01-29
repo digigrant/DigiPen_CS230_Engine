@@ -2,7 +2,7 @@
 //
 // File Name:	SpriteSource.h
 // Author(s):	Doug Schilling (dschilling)
-// Project:		Project 2
+// Project:		Project 5
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
@@ -28,6 +28,7 @@ extern "C" {
 
 typedef struct DGL_Texture DGL_Texture;
 typedef struct SpriteSource SpriteSource;
+typedef FILE* Stream;
 
 //------------------------------------------------------------------------------
 // Public Constants:
@@ -43,6 +44,15 @@ typedef struct SpriteSource SpriteSource;
 //   change the public interface declared in the header.
 typedef struct SpriteSource
 {
+	// The name of the sprite source.
+	// A buffer is used to allow each sprite source to have a unique name.
+	// The buffer is hardcoded to an arbitrary length that will be sufficient
+	//	 for all CS230 assignments.  You may, instead, use dynamically-allocated
+	//	 arrays for this purpose but the additional complexity is unnecessary
+	//	 and it is your responsibility to ensure that the memory is successfully
+	//	 allocated and deallocated in all possible situations.
+	char name[32];
+
 	// The dimensions of the sprite sheet.
 	// (Hint: These should be initialized to (1, 1).)
 	int	numRows;
@@ -86,6 +96,29 @@ void SpriteSourceFree(SpriteSource** spriteSource);
 //	 numRows = The number of rows in the sprite sheet.
 //	 textureName = The name of the texture to be loaded.
 void SpriteSourceLoadTexture(SpriteSource* spriteSource, int numCols, int numRows, const char* textureName);
+
+// Read the properties of a SpriteSource object from a file.
+// 1: Read a token from the stream.
+// 2: If the token read was "SpriteSource",
+//	  a: Read a token from the stream and store it in the name variable.
+//       (Hint: use strcpy_s for this purpose.)
+//    b: Read the numCols and numRows values from the stream.
+//	  c: Read a token from the stream. This is the path name of a texture.
+//	  d: Call DGL_Graphics_LoadTexture and store the texture resource.
+// Params:
+//	 spriteSource = Pointer to the SpriteSource object.
+//	 stream = Pointer to the data stream used for reading.
+void SpriteSourceRead(SpriteSource* spriteSource, Stream stream);
+
+// Determines if a SpriteSource has the specified name.
+// Params:
+//	 spriteSource = Pointer to the SpriteSource object.
+//	 name = Pointer to the name to be compared.
+// Returns:
+//	 If the SpriteSource and name pointers are valid,
+//		then perform a string comparison and return the result (match = true),
+//		else return false.
+bool SpriteSourceIsNamed(const SpriteSource* spriteSource, const char * name);
 
 // Returns the maximum number of frames possible, given the dimensions of the sprite sheet.
 // (Hint: Frame count = numCols * numRows.)

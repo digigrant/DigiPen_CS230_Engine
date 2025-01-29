@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	MeshLibrary.c
+// File Name:	Teleporter.c
 // Author(s):	Grant Joyner (g.joyner)
 // Project:		Project 4
 // Course:		CS230S24
@@ -10,25 +10,20 @@
 //------------------------------------------------------------------------------
 
 #include "stdafx.h"
-#include "MeshLibrary.h"
-#include "Mesh.h"
-#include "Stream.h"
+#include "Teleporter.h"
+#include "Entity.h"
+#include "Transform.h"
+#include "Physics.h"
+#include "DGL.h"
+#include "Vector2D.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
 //------------------------------------------------------------------------------
 
-#define MESH_LIST_SIZE 10
-
 //------------------------------------------------------------------------------
 // Private Structures:
 //------------------------------------------------------------------------------
-
-typedef struct MeshLibrary
-{
-	const Mesh* meshList[MESH_LIST_SIZE];
-	unsigned int meshCount;
-} MeshLibrary;
 
 //------------------------------------------------------------------------------
 // Public Variables:
@@ -38,84 +33,57 @@ typedef struct MeshLibrary
 // Private Variables:
 //------------------------------------------------------------------------------
 
-static MeshLibrary meshes;
-
 //------------------------------------------------------------------------------
 // Private Function Declarations:
 //------------------------------------------------------------------------------
-
-static void MeshLibraryAdd(const Mesh* mesh);
-static const Mesh* MeshLibraryFind(const char* meshName);
 
 //------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
 
-void MeshLibraryInit()
+void TeleporterUpdateEntity(Entity* entity)
 {
-	// Set everything to 0
-	meshes.meshCount = 0;
-	for (unsigned int i = 0; i < MESH_LIST_SIZE; ++i)
+	Vector2D window_size = DGL_Window_GetSize();
+	Vector2D window_half_size;
+	Vector2DScale(&window_half_size, &window_size, 0.5f);
+
+	Transform* entity_transform = EntityGetTransform(entity);
+	Physics* entity_physics = EntityGetPhysics(entity);
+
+	Vector2D delta_position = { 0.0f, 0.0f };
+	
+	// check x dir
+	if (PhysicsGetVelocity(entity_physics)->x > 0.0f &&
+		TransformGetTranslation(entity_transform)->x > window_half_size.x)
 	{
-		meshes.meshList[i] = NULL;
+		delta_position.x = -window_size.x;
 	}
-}
-
-const Mesh* MeshLibraryBuild(const char* meshName)
-{
-	if (!meshName) { return NULL; }
-
-	const Mesh* mesh = MeshLibraryFind(meshName);
-
-	if (!mesh)
+	else if (PhysicsGetVelocity(entity_physics)->x < 0.0f &&
+		TransformGetTranslation(entity_transform)->x < -window_half_size.x)
 	{
-		char filename[256] = "";
-		sprintf_s(filename, _countof(filename), "Data/%s.txt", meshName);
-		Stream stream = StreamOpen(filename);
-
-		if (stream)
-		{
-			Mesh* new_mesh = MeshCreate();
-			MeshRead(new_mesh, stream);
-			MeshLibraryAdd(new_mesh);
-			mesh = new_mesh;
-			StreamClose(&stream);
-		}
+		delta_position.x = window_size.x;
 	}
 
-	return mesh;
-}
-
-void MeshLibraryFreeAll()
-{
-	for (unsigned int i = 0; i < meshes.meshCount; ++i)
+	// check y dir
+	if (PhysicsGetVelocity(entity_physics)->y > 0.0f &&
+		TransformGetTranslation(entity_transform)->y > window_half_size.y)
 	{
-		MeshFree(&(meshes.meshList[i]));
+		delta_position.y = -window_size.y;
 	}
-	MeshLibraryInit(); // Reset the mesh library
+	else if (PhysicsGetVelocity(entity_physics)->y < 0.0f &&
+		TransformGetTranslation(entity_transform)->y < -window_half_size.y)
+	{
+		delta_position.y = window_size.y;
+	}
+
+	if (delta_position.x != 0.0f || delta_position.y != 0.0f)
+	{
+		Vector2D new_position;
+		Vector2DAdd(&new_position, TransformGetTranslation(entity_transform), &delta_position);
+		TransformSetTranslation(entity_transform, &new_position);
+	}
 }
 
 //------------------------------------------------------------------------------
 // Private Functions:
 //------------------------------------------------------------------------------
-
-static void MeshLibraryAdd(const Mesh* mesh)
-{
-	if (meshes.meshCount >= MESH_LIST_SIZE) { return; }
-
-	meshes.meshList[meshes.meshCount] = mesh;
-	++(meshes.meshCount);
-}
-
-static const Mesh* MeshLibraryFind(const char* meshName)
-{
-	for (unsigned int i = 0; i < meshes.meshCount; ++i)
-	{
-		if (MeshIsNamed(meshes.meshList[i], meshName))
-		{
-			return meshes.meshList[i];
-		}
-	}
-
-	return NULL;
-}

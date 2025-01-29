@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	Scene.h
+// File Name:	ScoreSystem.h
 // Author(s):	Doug Schilling (dschilling)
 // Project:		Project 5
 // Course:		CS230S24
@@ -25,34 +25,28 @@ extern "C" {	// Assume C declarations for C++.
 // Forward References:
 //------------------------------------------------------------------------------
 
-typedef struct Entity Entity;
+typedef struct BaseSystem BaseSystem;
 
 //------------------------------------------------------------------------------
 // Public Constants:
 //------------------------------------------------------------------------------
 
+typedef enum
+{
+	SCORE_SYSTEM_ID_INVALID = -1,
+	SCORE_SYSTEM_ID_SCORE = 0,
+	SCORE_SYSTEM_ID_HIGH_SCORE,
+	SCORE_SYSTEM_ID_WAVE_COUNT,
+	SCORE_SYSTEM_ID_MAX,
+} ScoreSystemId;
+
 //------------------------------------------------------------------------------
 // Public Typedefs:
 //------------------------------------------------------------------------------
 
-typedef void(*SceneFunctionVoidVoid)(void);
-typedef void(*SceneFunctionVoidFloat)(float dt);
-
 //------------------------------------------------------------------------------
 // Public Structures:
 //------------------------------------------------------------------------------
-
-// Structure to store the scene-specific State function pointers.
-typedef struct Scene
-{
-	const char* name;
-	SceneFunctionVoidVoid	load;
-	SceneFunctionVoidVoid	init;
-	SceneFunctionVoidFloat	update;
-	SceneFunctionVoidVoid	render;
-	SceneFunctionVoidVoid	exit;
-	SceneFunctionVoidVoid	unload;
-} Scene;
 
 //------------------------------------------------------------------------------
 // Public Variables:
@@ -62,39 +56,36 @@ typedef struct Scene
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Verify that a scene is valid (no NULL pointers).
+// Get the instance of the Score System.
+BaseSystem* ScoreSystemGetInstance(void);
+
+// Clear the Score System
+// (Set the score, highScore, and waveCount variables to 0.)
+void ScoreSystemClear(void);
+
+// Reset the Score System.
+// (Step 1: The highScore variable should be updated if score is higher.)
+// (Step 2: The score and waveCount variables should be set to zero.)
+void ScoreSystemReset(void);
+
+// Get the specified value from the Score System.
+// (HINT: There many different ways to handle this.  Two options include:
+//   - Store the Score System variables in an array and use this index
+//     to access into the array.
+//   - Use a switch-statement to access the correct variable.)
+// returns:
+//   The value stored in the specified variable.
+unsigned ScoreSystemGetValue(ScoreSystemId valueId);
+
+// Increase the current score by a specified amount.
 // Params:
-//   scene	Pointer to the scene to be checked.
-bool SceneIsValid(const Scene* scene);
+//   amount = The amount to be added to the score.
+void ScoreSystemIncreaseScore(unsigned amount);
 
-// Functions for executing the scene-specific State functions.
-void SceneLoad(const Scene* scene);
-void SceneInit(const Scene* scene);
-void SceneUpdate(const Scene* scene, float dt);
-void SceneRender(const Scene* scene);
-void SceneExit(const Scene* scene);
-void SceneUnload(const Scene* scene);
+// Increase the current wave count by one.
+void ScoreSystemIncreaseWave(void);
 
-// Restart the active scene.
-void SceneRestart(void);
-
-// Add an Entity to the Scene.
-// (NOTE: This is done by storing the Entity within an EntityContainer.)
-// Params:
-//   entity = Pointer to the Entity to be added.
-void SceneAddEntity(Entity* entity);
-
-// Find a named Entity within the Scene.
-// (Hint: Use the function, EntityContainerFindByName, for this purpose.)
-// Params:
-//   entityName = The name of the Entity to be returned.
-// Returns:
-//	 If entityName is valid and the Entity was located successfully,
-//		then return a pointer to the Entity,
-//		else return NULL.
-Entity* SceneFindEntityByName(const char* entityName);
-
-//------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------*/
 
 #ifdef __cplusplus
 }                       // End of extern "C" {

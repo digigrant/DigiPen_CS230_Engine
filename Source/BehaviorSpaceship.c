@@ -19,6 +19,9 @@
 #include "Vector2D.h"
 #include "DGL.h"
 #include "Scene.h"
+#include "Teleporter.h"
+#include "Collider.h"
+#include "Sprite.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -31,14 +34,16 @@ typedef enum
 {
 	SPACESHIP_INVALID = -1,
 	SPACESHIP_IDLE,
-	SPACESHIP_THRUST
+	SPACESHIP_THRUST,
+	SPACESHIP_DEAD
 } SpaceshipState;
 
 static const float SPACESHIP_ACCELERATION = 150.0f;
 static const float SPACESHIP_SPEED_MAX = 500.0f;
 static const float SPACESHIP_TURN_RATE_MAX = (float)(M_PI) / 1.5f;
-static const float SPACESHIP_WEAPON_COOLDOWN_TIME = 0.034f;
+static const float SPACESHIP_WEAPON_COOLDOWN_TIME = 0.25f;
 static const float SPACESHIP_WEAPON_BULLET_SPEED = 750.0f;
+static const float SPACESHIP_DEATH_DURATION = 3.0f;
 
 //------------------------------------------------------------------------------
 // Private Structures:
@@ -63,6 +68,7 @@ static void BehaviorSpaceshipUpdateRotation(Behavior* behavior, float dt);
 static void BehaviorSpaceshipUpdateVelocity(Behavior* behavior, float dt);
 static void BehaviorSpaceshipUpdateWeapon(Behavior* behavior, float dt);
 static void BehaviorSpaceshipSpawnBullet(Behavior* behavior);
+static void BehaviorSpaceshipCollisionHandler(Entity* spaceship, Entity* other);
 
 //------------------------------------------------------------------------------
 // Public Functions:
@@ -75,6 +81,7 @@ Behavior* BehaviorSpaceshipCreate(void)
 
 	if (!behavior) return NULL;
 
+	behavior->memorySize = sizeof(Behavior);
 	behavior->stateCurr = SPACESHIP_INVALID;
 	behavior->stateNext = SPACESHIP_INVALID;
 	behavior->onInit = BehaviorSpaceshipOnInit;
@@ -90,7 +97,21 @@ Behavior* BehaviorSpaceshipCreate(void)
 
 void BehaviorSpaceshipOnInit(Behavior* behavior)
 {
-	UNREFERENCED_PARAMETER(behavior);
+	if (!behavior) return;
+
+	if (behavior->stateCurr == SPACESHIP_IDLE)
+	{
+		Collider* collider = EntityGetCollider(behavior->parent);
+		if (collider)
+		{
+			ColliderSetCollisionHandler(collider, BehaviorSpaceshipCollisionHandler);
+		}
+	}
+	else if (behavior->stateCurr == SPACESHIP_DEAD)
+	{
+		behavior->timer = SPACESHIP_DEATH_DURATION;
+		// do something jere
+	}
 }
 
 void BehaviorSpaceshipOnUpdate(Behavior* behavior, float dt)
@@ -115,7 +136,6 @@ void BehaviorSpaceshipOnUpdate(Behavior* behavior, float dt)
 	{
 		BehaviorSpaceshipUpdateRotation(behavior, dt);
 		BehaviorSpaceshipUpdateWeapon(behavior, dt);
-
 		BehaviorSpaceshipUpdateVelocity(behavior, dt);
 
 		if (!DGL_Input_KeyDown(VK_UP))
@@ -125,9 +145,23 @@ void BehaviorSpaceshipOnUpdate(Behavior* behavior, float dt)
 		break;
 	}
 
+	case SPACESHIP_DEAD:
+	{
+		behavior->timer -= dt;
+
+		if (behavior->timer <= 0.0f) { SceneRestart(); }
+
+		SpriteSetAlpha(EntityGetSprite(behavior->parent), behavior->timer / SPACESHIP_DEATH_DURATION);
+		TransformSetRotation(EntityGetTransform(behavior->parent), TransformGetRotation(EntityGetTransform(behavior->parent)) + (dt * 5.0f));
+
+		break;
+	}
+
 	default:
 		break;
 	}
+
+	TeleporterUpdateEntity(behavior->parent);
 }
 
 void BehaviorSpaceshipOnExit(Behavior* behavior)
@@ -220,3 +254,12 @@ void BehaviorSpaceshipSpawnBullet(Behavior* behavior)
 	SceneAddEntity(bullet);
 }
 
+void BehaviorSpaceshipCollisionHandler(Entity* spaceship, Entity* other)
+{
+	if (!spaceship || !other) return;
+
+	if (strcmp(EntityGetName(other), "Asteroid") == 0)
+	{
+		EntityGetBehavior(spaceship)->stateNext = SPACESHIP_DEAD;
+	}
+}

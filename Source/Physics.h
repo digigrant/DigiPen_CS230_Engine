@@ -2,7 +2,7 @@
 //
 // File Name:	Physics.h
 // Author(s):	Doug Schilling (dschilling)
-// Project:		Project 4
+// Project:		Project 5
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
@@ -54,6 +54,9 @@ typedef struct Physics
 
 	// Rotational velocity (in radians).
 	float rotationalVelocity;
+
+	// Drag to be applied to moving objects in order to slow them down.
+	float drag;
 
 	// Used when calculating acceleration due to forces.
 	// Used when resolving collision between two dynamic objects.
@@ -154,6 +157,13 @@ void PhysicsSetVelocity(Physics* physics, const Vector2D * velocity);
 //	 physics = Pointer to the physics component.
 //	 rotationalVelocity = The new rotational velocity.
 void PhysicsSetRotationalVelocity(Physics* physics, float rotationalVelocity);
+
+// Set the "drag" value of a Physics component.
+// (NOTE: This value should be clamped between [0.0f, 1.0f].
+// Params:
+//	 physics = Pointer to the physics component.
+//	 drag = The new drag value.
+void PhysicsSetDrag(Physics* physics, float drag);
 
 // Update the state of a Physics component using the Semi-Implicit Euler method,
 //	 as outlined in the "Dynamics" lecture slides and the project instructions.

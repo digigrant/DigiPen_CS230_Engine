@@ -18,6 +18,7 @@
 #include "EntityContainer.h"
 #include "EntityFactory.h"
 #include "MeshLibrary.h"
+#include "SpriteSourceLibrary.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -74,6 +75,7 @@ void SceneLoad(const Scene* scene)
 
 		entities = EntityContainerCreate(); // Do this before calling the Load function
 		MeshLibraryInit();
+		SpriteSourceLibraryInit();
 		(*scene->load)();
 	}
 }
@@ -99,8 +101,9 @@ void SceneUpdate(const Scene* scene, float dt)
 		// TODO: Call TraceMessage, passing the format string "%s: Update" and the name of the scene.
 		TraceMessage("%s: Update", scene->name);
 
-		EntityContainerUpdateAll(entities, dt); // TODO: Should this happen before or after the scene update?
 		(*scene->update)(dt);
+		EntityContainerUpdateAll(entities, dt);
+		EntityContainerCheckCollisions(entities);
 	}
 }
 
@@ -145,6 +148,7 @@ void SceneUnload(const Scene* scene)
 		// Execute the Unload function.
 		(*scene->unload)();
 		MeshLibraryFreeAll();
+		SpriteSourceLibraryFreeAll();
 		EntityContainerFree(&entities); // Do this after calling the Unload function
 	}
 }
@@ -162,6 +166,11 @@ void SceneAddEntity(Entity* entity)
 	{
 		EntityContainerAddEntity(entities, entity);
 	}
+}
+
+Entity* SceneFindEntityByName(const char* entityName)
+{
+	return EntityContainerFindByName(entities, entityName);
 }
 
 //------------------------------------------------------------------------------

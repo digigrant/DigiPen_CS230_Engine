@@ -19,6 +19,7 @@
 #include "Transform.h"
 #include "SpriteSource.h"
 #include "Matrix2D.h"
+#include "SpriteSourceLibrary.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -72,13 +73,9 @@ Sprite* SpriteClone(const Sprite* other)
 	if (!other) { return NULL; }
 
 	Sprite* sprite = (Sprite*)malloc(sizeof(Sprite));
-	if (sprite)
-	{
-		// shallow copy! pointers are copied as is!
-		// sprite_source, mesh, text - all const, should be ok
-		memcpy_s(sprite, sizeof(Sprite), other, sizeof(Sprite));
-	}
-
+	if (!sprite) { return NULL; }
+	
+	memcpy_s(sprite, sizeof(Sprite), other, sizeof(Sprite));
 	return sprite;
 }
 
@@ -98,12 +95,21 @@ void SpriteRead(Sprite* sprite, Stream stream)
 	sprite->alpha = StreamReadFloat(stream);
 
 	char name[256] = "";
-	strcpy_s(name, _countof(name), StreamReadToken(stream));
 
+	// mesh name
+	strcpy_s(name, _countof(name), StreamReadToken(stream));
 	if (name[0] != '\0' && strcmp(name, "None") != 0)
 	{
 		const Mesh* mesh = MeshLibraryBuild(name);
 		SpriteSetMesh(sprite, mesh);
+	}
+
+	// sprite source name
+	strcpy_s(name, _countof(name), StreamReadToken(stream));
+	if (name[0] != '\0' && strcmp(name, "None") != 0)
+	{
+		const SpriteSource* spriteSource = SpriteSourceLibraryBuild(name);
+		SpriteSetSpriteSource(sprite, spriteSource);
 	}
 }
 

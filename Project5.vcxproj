@@ -175,9 +175,12 @@
     <ClCompile Include="Source\Animation.c" />
     <ClCompile Include="Source\AsteroidsScene.c" />
     <ClCompile Include="Source\Behavior.c" />
+    <ClCompile Include="Source\BehaviorAsteroid.c" />
     <ClCompile Include="Source\BehaviorBullet.c" />
+    <ClCompile Include="Source\BehaviorHudText.c" />
     <ClCompile Include="Source\BehaviorSpaceship.c" />
     <ClCompile Include="Source\CheatSystem.c" />
+    <ClCompile Include="Source\Collider.c" />
     <ClCompile Include="Source\Engine.c" />
     <ClCompile Include="Source\Entity.c" />
     <ClCompile Include="Source\EntityContainer.c" />
@@ -188,14 +191,17 @@
     <ClCompile Include="Source\MeshLibrary.c" />
     <ClCompile Include="Source\Physics.c" />
     <ClCompile Include="Source\PlatformSystem.c" />
+    <ClCompile Include="Source\Random.c" />
     <ClCompile Include="Source\SandboxScene.c" />
     <ClCompile Include="Source\Scene.c" />
     <ClCompile Include="Source\DemoScene.c" />
     <ClCompile Include="Source\Level1Scene.c" />
     <ClCompile Include="Source\Level2Scene.c" />
     <ClCompile Include="Source\SceneSystem.c" />
+    <ClCompile Include="Source\ScoreSystem.c" />
     <ClCompile Include="Source\Sprite.c" />
     <ClCompile Include="Source\SpriteSource.c" />
+    <ClCompile Include="Source\SpriteSourceLibrary.c" />
     <ClCompile Include="Source\stdafx.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -206,6 +212,7 @@
     <ClCompile Include="Source\Stub.c" />
     <ClCompile Include="Source\StubScene.c" />
     <ClCompile Include="Source\StubSystem.c" />
+    <ClCompile Include="Source\Teleporter.c" />
     <ClCompile Include="Source\Trace.c" />
     <ClCompile Include="Source\Transform.c" />
     <ClCompile Include="Source\Vector2D.c" />
@@ -214,9 +221,12 @@
     <ClInclude Include="Source\Animation.h" />
     <ClInclude Include="Source\AsteroidsScene.h" />
     <ClInclude Include="Source\Behavior.h" />
+    <ClInclude Include="Source\BehaviorAsteroid.h" />
     <ClInclude Include="Source\BehaviorBullet.h" />
+    <ClInclude Include="Source\BehaviorHudText.h" />
     <ClInclude Include="Source\BehaviorSpaceship.h" />
     <ClInclude Include="Source\CheatSystem.h" />
+    <ClInclude Include="Source\Collider.h" />
     <ClInclude Include="Source\Engine.h" />
     <ClInclude Include="Source\Entity.h" />
     <ClInclude Include="Source\EntityContainer.h" />
@@ -226,14 +236,17 @@
     <ClInclude Include="Source\MeshLibrary.h" />
     <ClInclude Include="Source\Physics.h" />
     <ClInclude Include="Source\PlatformSystem.h" />
+    <ClInclude Include="Source\Random.h" />
     <ClInclude Include="Source\SandboxScene.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\DemoScene.h" />
     <ClInclude Include="Source\Level1Scene.h" />
     <ClInclude Include="Source\Level2Scene.h" />
     <ClInclude Include="Source\SceneSystem.h" />
+    <ClInclude Include="Source\ScoreSystem.h" />
     <ClInclude Include="Source\Sprite.h" />
     <ClInclude Include="Source\SpriteSource.h" />
+    <ClInclude Include="Source\SpriteSourceLibrary.h" />
     <ClInclude Include="Source\stdafx.h" />
     <ClInclude Include="Source\Stream.h" />
     <ClInclude Include="Source\Stub.h" />
@@ -241,6 +254,7 @@
     <ClInclude Include="Source\StubScene.h" />
     <ClInclude Include="Source\StubSystem.h" />
     <ClInclude Include="Source\targetver.h" />
+    <ClInclude Include="Source\Teleporter.h" />
     <ClInclude Include="Source\Trace.h" />
     <ClInclude Include="Source\Transform.h" />
     <ClInclude Include="Source\Vector2D.h" />

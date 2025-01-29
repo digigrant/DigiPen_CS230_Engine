@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	MeshLibrary.h
+// File Name:	SpriteSourceLibrary.h
 // Author(s):	Doug Schilling (dschilling)
-// Project:		Project 4
+// Project:		Project 5
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
@@ -26,7 +26,7 @@ extern "C" {
 // Forward References:
 //------------------------------------------------------------------------------
 
-typedef struct Mesh Mesh;
+typedef struct SpriteSource SpriteSource;
 
 //------------------------------------------------------------------------------
 // Public Consts:
@@ -36,22 +36,21 @@ typedef struct Mesh Mesh;
 // Public Structures:
 //------------------------------------------------------------------------------
 
-// An example of the structure to be defined in MeshLibrary.c.
+// An example of the structure to be defined in SpriteSourceLibrary.c.
 #if 0
 // You are free to change the contents of this structure as long as you do not
 //   change the public interface declared in the header.
-typedef struct MeshLibrary
-{
-	// This variable is not required but could be used for tracking the number
-	//   of Mesh objects currently in the list.
-	unsigned int meshCount;
+	typedef struct SpriteSourceLibrary
+	{
+		// The number of sprite sources currently in the list.
+		unsigned int spriteSourceCount;
 
-	// A list of all currently loaded meshes.
-	// This list can be a fixed-length array (minimum size of 10 entries)
-	// or a dynamically-sized array, such as a linked list.
-	const Mesh* meshList[meshListSize];
+		// A list of all currently loaded sprite sources.
+		// This list can be a fixed-length array (minimum size of 10 entries)
+		// or a dynamically-sized array, such as a linked list.
+		SpriteSource*	spriteSourceList[spriteSourceListSize];
 
-} MeshLibrary;
+	} SpriteSourceLibrary;
 #endif
 
 //------------------------------------------------------------------------------
@@ -62,35 +61,34 @@ typedef struct MeshLibrary
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Initialize the Mesh Library.
+// Initialize the SpriteSource Library.
 // (NOTE: Make sure to initialize all memory to zero.)
-void MeshLibraryInit();
+void SpriteSourceLibraryInit();
 
-// Build a mesh and add it to the mesh library, if it doesn't already exist.
-//   1: Verify that a valid name was specified (not NULL).
-//   2: Search for an existing mesh with a matching name.
-//   3: If an existing mesh was NOT found, then create a new one from the data file:
-//      a: Use sprintf_s() to construct a path name using meshName.
-//	       (HINT: The correct path name should be constructed using "Data/%s.txt".)
-//      b: Call StreamOpen(), passing the pathname.
-//      c: If the stream was opened successfully,
-//	       1: Call MeshCreate() to create an empty Mesh object.
-//         2: Call MeshRead() to read the contents of the mesh from the file.
-//	       3: Call MeshLibraryAdd(), passing the created mesh.
-//	       4: Close the stream.
-//   4: Return the mesh (either existed, created, or NULL).
+// Create a SpriteSource and add it to the SpriteSource manager.
+// 1: Call SpriteSourceLibraryFind() to determine if the sprite source already exists
+// 2: If the named sprite source does not already exist,
+//	  a: Use sprintf_s() to construct a path name using spriteSourceName
+//	     (HINT: The correct path name should be constructed using "Data/%s.txt".)
+//	  b: Call StreamOpen(), passing the path name
+//    c: If the stream was opened successfully,
+//		 1: Call SpriteSourceCreate() to construct a new, empty SpriteSource.
+//       2: Call SpriteSourceRead() to read the SpriteSource data from the file.
+//		 3: Call SpriteSourceLibraryAdd(), passing the created SpriteSource.
+//       4: Close the stream.
+// 3: Return the SpriteSource (already existing or just created)
 // Params:
-//	 meshName = The name of the mesh to be created.
+//	 SpriteSourceName = The name of the SpriteSource to be created.
 // Returns:
-//	 If the mesh already existed or was created successfully,
-//	   then return a pointer to the mesh,
+//	 If the SpriteSource already exists or was created successfully,
+//	   then return a pointer to the SpriteSource,
 //	   else return NULL.
-const Mesh* MeshLibraryBuild(const char * meshName);
+const SpriteSource* SpriteSourceLibraryBuild(const char * spriteSourceName);
 
-// Free all Mesh objects in the Mesh Library.
-// (NOTE: You must call MeshFree() to free each Mesh object.)
+// Free all SpriteSource objects in the SpriteSource Library.
+// (NOTE: You must call SpriteSourceFree() to free each SpriteSource object.)
 // (HINT: The list should contain nothing but NULL pointers once this function is done.)
-void MeshLibraryFreeAll();
+void SpriteSourceLibraryFreeAll();
 
 //------------------------------------------------------------------------------
 

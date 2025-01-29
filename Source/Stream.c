@@ -9,6 +9,7 @@
 //
 //------------------------------------------------------------------------------
 
+#include <stdio.h>
 #include "stdafx.h"
 #include "Stream.h"
 #include "Trace.h"
@@ -120,12 +121,23 @@ const char* StreamReadToken(Stream stream)
 	token_buffer[0] = '\0';
 
 	_set_errno(0);
-	if (fscanf_s(stream, "%s", token_buffer, 1024) == EOF)
+	while (fgets(token_buffer, sizeof(token_buffer), stream))
 	{
-		// If there was an error, trace the error message and return NULL
-		char errorMsg[256];
-		strerror_s(errorMsg, 256, errno);
-		TraceMessage("Error: StreamReadToken could not read token; %s", errorMsg);
+		if (!token_buffer)
+		{
+			// If there was an error, trace the error message and return NULL
+			char errorMsg[256];
+			strerror_s(errorMsg, 256, errno);
+			TraceMessage("Error: StreamReadToken could not read token; %s", errorMsg);
+		}
+
+		if (token_buffer[0] != '\n') { break; }
+	}
+
+	size_t len = strlen(token_buffer);
+	if (len > 0 && token_buffer[len - 1] == '\n')
+	{
+		token_buffer[len - 1] = '\0';
 	}
 
 	return token_buffer;

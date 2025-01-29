@@ -17,6 +17,7 @@
 #include "BaseSystem.h"
 #include "Engine.h"
 #include "Trace.h"
+#include "Random.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -73,10 +74,12 @@ bool EngineInit()
 	TraceInit();
 	TraceMessage("Engine: Init");
 
+	// Initialize the pseudorandom number generator (PRNG).
+	RandomInit();
+
 	//--------------------------------------------------------------------------
 	// Initialize all systems.
 	//--------------------------------------------------------------------------
-
 	for (unsigned i = 0; i < engine.systemCount; ++i)
 	{
 		BaseSystem* system = engine.systems[i];

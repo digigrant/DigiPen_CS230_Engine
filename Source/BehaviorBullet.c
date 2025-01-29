@@ -13,6 +13,8 @@
 #include "BehaviorBullet.h"
 #include "Behavior.h"
 #include "Entity.h"
+#include "Teleporter.h"
+#include "Collider.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -44,6 +46,7 @@ static void BehaviorBulletOnInit(Behavior* behavior);
 static void BehaviorBulletOnUpdate(Behavior* behavior, float dt);
 static void BehaviorBulletOnExit(Behavior* behavior);
 static void BehaviorBulletUpdateLifeTimer(Behavior* behavior, float dt);
+static void BehaviorBulletCollisionHandler(Entity* bullet, Entity* other);
 
 //------------------------------------------------------------------------------
 // Public Functions:
@@ -53,8 +56,9 @@ static void BehaviorBulletUpdateLifeTimer(Behavior* behavior, float dt);
 Behavior* BehaviorBulletCreate(void)
 {
 	Behavior* behavior = (Behavior*)calloc(1, sizeof(Behavior));
-	if (!behavior) return NULL;
+	if (!behavior) { return NULL; }
 
+	behavior->memorySize = sizeof(Behavior);
 	behavior->stateCurr = BULLET_INVALID;
 	behavior->stateNext = BULLET_IDLE;
 	behavior->onInit = BehaviorBulletOnInit;
@@ -70,7 +74,16 @@ Behavior* BehaviorBulletCreate(void)
 
 void BehaviorBulletOnInit(Behavior* behavior)
 {
-	UNREFERENCED_PARAMETER(behavior);
+	if (!behavior) return;
+
+	if (behavior->stateCurr == BULLET_IDLE)
+	{
+		Collider* collider = EntityGetCollider(behavior->parent);
+		if (collider)
+		{
+			ColliderSetCollisionHandler(collider, BehaviorBulletCollisionHandler);
+		}
+	}
 }
 
 void BehaviorBulletOnUpdate(Behavior* behavior, float dt)
@@ -83,6 +96,8 @@ void BehaviorBulletOnUpdate(Behavior* behavior, float dt)
 		BehaviorBulletUpdateLifeTimer(behavior, dt);
 		break;
 	}
+
+	TeleporterUpdateEntity(behavior->parent);
 }
 
 void BehaviorBulletOnExit(Behavior* behavior)
@@ -102,5 +117,15 @@ void BehaviorBulletUpdateLifeTimer(Behavior* behavior, float dt)
 	if (behavior->timer <= 0.0f)
 	{
 		EntityDestroy(behavior->parent);
+	}
+}
+
+void BehaviorBulletCollisionHandler(Entity* bullet, Entity* other)
+{
+	if (!bullet || !other) return;
+
+	if (strcmp(EntityGetName(other), "Asteroid") == 0)
+	{
+		EntityDestroy(bullet);
 	}
 }

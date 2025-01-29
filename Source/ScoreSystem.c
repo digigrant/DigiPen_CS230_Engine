@@ -1,8 +1,8 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	MeshLibrary.c
+// File Name:	ScoreSystem.c
 // Author(s):	Grant Joyner (g.joyner)
-// Project:		Project 4
+// Project:		Project 5
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.
@@ -10,112 +10,123 @@
 //------------------------------------------------------------------------------
 
 #include "stdafx.h"
-#include "MeshLibrary.h"
-#include "Mesh.h"
-#include "Stream.h"
+#include <Windows.h>
+
+#include "BaseSystem.h"
+#include "ScoreSystem.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
 //------------------------------------------------------------------------------
 
-#define MESH_LIST_SIZE 10
-
 //------------------------------------------------------------------------------
 // Private Structures:
 //------------------------------------------------------------------------------
 
-typedef struct MeshLibrary
+typedef struct ScoreSystem
 {
-	const Mesh* meshList[MESH_LIST_SIZE];
-	unsigned int meshCount;
-} MeshLibrary;
+	// WARNING: The base class must always be included first.
+	BaseSystem	base;
+
+	unsigned score;
+	unsigned high_score;
+	unsigned wave_count;
+
+} ScoreSystem;
 
 //------------------------------------------------------------------------------
 // Public Variables:
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-// Private Variables:
-//------------------------------------------------------------------------------
-
-static MeshLibrary meshes;
-
-//------------------------------------------------------------------------------
 // Private Function Declarations:
 //------------------------------------------------------------------------------
 
-static void MeshLibraryAdd(const Mesh* mesh);
-static const Mesh* MeshLibraryFind(const char* meshName);
+static bool ScoreSystemInit(void);
+static void ScoreSystemUpdate(float dt);
+static void ScoreSystemRender(void);
+static void ScoreSystemExit(void);
+
+//------------------------------------------------------------------------------
+// Private Variables:
+//------------------------------------------------------------------------------
+
+static ScoreSystem instance =
+{
+	{ "ScoreSystem", ScoreSystemInit, ScoreSystemUpdate, ScoreSystemRender, ScoreSystemExit},
+};
 
 //------------------------------------------------------------------------------
 // Public Functions:
 //------------------------------------------------------------------------------
 
-void MeshLibraryInit()
+BaseSystem* ScoreSystemGetInstance()
 {
-	// Set everything to 0
-	meshes.meshCount = 0;
-	for (unsigned int i = 0; i < MESH_LIST_SIZE; ++i)
+	return (BaseSystem*)&instance;
+}
+
+void ScoreSystemClear(void)
+{
+	instance.score = 0;
+	instance.high_score = 0;
+	instance.wave_count = 0;
+}
+
+void ScoreSystemReset(void)
+{
+	if (instance.score > instance.high_score)
 	{
-		meshes.meshList[i] = NULL;
+		instance.high_score = instance.score;
+	}
+
+	instance.score = 0;
+	instance.wave_count = 0;
+}
+
+unsigned ScoreSystemGetValue(ScoreSystemId valueId)
+{
+	switch (valueId)
+	{
+	case SCORE_SYSTEM_ID_SCORE:
+		return instance.score;
+	case SCORE_SYSTEM_ID_HIGH_SCORE:
+		return instance.high_score;
+	case SCORE_SYSTEM_ID_WAVE_COUNT:
+		return instance.wave_count;
+	default:
+		return 0;
 	}
 }
 
-const Mesh* MeshLibraryBuild(const char* meshName)
+void ScoreSystemIncreaseScore(unsigned amount)
 {
-	if (!meshName) { return NULL; }
-
-	const Mesh* mesh = MeshLibraryFind(meshName);
-
-	if (!mesh)
-	{
-		char filename[256] = "";
-		sprintf_s(filename, _countof(filename), "Data/%s.txt", meshName);
-		Stream stream = StreamOpen(filename);
-
-		if (stream)
-		{
-			Mesh* new_mesh = MeshCreate();
-			MeshRead(new_mesh, stream);
-			MeshLibraryAdd(new_mesh);
-			mesh = new_mesh;
-			StreamClose(&stream);
-		}
-	}
-
-	return mesh;
+	instance.score += amount;
 }
 
-void MeshLibraryFreeAll()
+void ScoreSystemIncreaseWave(void)
 {
-	for (unsigned int i = 0; i < meshes.meshCount; ++i)
-	{
-		MeshFree(&(meshes.meshList[i]));
-	}
-	MeshLibraryInit(); // Reset the mesh library
+	instance.wave_count++;
 }
 
 //------------------------------------------------------------------------------
 // Private Functions:
 //------------------------------------------------------------------------------
 
-static void MeshLibraryAdd(const Mesh* mesh)
+static bool ScoreSystemInit(void)
 {
-	if (meshes.meshCount >= MESH_LIST_SIZE) { return; }
-
-	meshes.meshList[meshes.meshCount] = mesh;
-	++(meshes.meshCount);
+	return true;
 }
 
-static const Mesh* MeshLibraryFind(const char* meshName)
+static void ScoreSystemUpdate(float dt)
 {
-	for (unsigned int i = 0; i < meshes.meshCount; ++i)
-	{
-		if (MeshIsNamed(meshes.meshList[i], meshName))
-		{
-			return meshes.meshList[i];
-		}
-	}
-
-	return NULL;
+	UNREFERENCED_PARAMETER(dt);
 }
+
+static void ScoreSystemRender(void)
+{
+}
+
+static void ScoreSystemExit(void)
+{
+}
+
