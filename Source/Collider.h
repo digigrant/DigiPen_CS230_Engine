@@ -36,9 +36,9 @@ typedef FILE* Stream;
 
 typedef enum ColliderType
 {
-	ColliderTypeNone,
-	ColliderTypeCircle,
-	ColliderTypeLine,
+	COLLIDER_TYPE_NONE,
+	COLLIDER_TYPE_CIRCLE,
+	COLLIDER_TYPE_LINE,
 
 } ColliderType;
 
@@ -119,4 +119,3 @@ void ColliderSetCollisionHandler(Collider* collider, CollisionEventHandler handl
 #ifdef __cplusplus
 }                       /* End of extern "C" { */
 #endif
-
