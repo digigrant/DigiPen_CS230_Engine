@@ -11,9 +11,13 @@
 
 #include "stdafx.h"
 #include "ColliderLine.h"
+#include "ColliderCircle.h"
 #include "Collider.h"
 #include "Vector2D.h"
 #include "Stream.h"
+#include "Entity.h"
+#include "Physics.h"
+#include "Transform.h"
 
 //------------------------------------------------------------------------------
 // Private Constants:
@@ -98,8 +102,55 @@ void ColliderLineAddLineSegment(Collider* collider, const Vector2D* p0, const Ve
 
 bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider* other)
 {
-	UNREFERENCED_PARAMETER(collider);
-	UNREFERENCED_PARAMETER(other);
+	if (!collider || !other || collider->type != COLLIDER_TYPE_LINE || other->type != COLLIDER_TYPE_CIRCLE) { return false; }
+
+	Entity* other_entity = other->parent;
+	const Vector2D* bs = PhysicsGetOldTranslation(EntityGetPhysics(other_entity));
+	const Vector2D* be = TransformGetTranslation(EntityGetTransform(other_entity));
+
+	Vector2D v, e, n, bi, p0p1, p1p0, bip0, bip1;
+	const Vector2D* p0;
+	const Vector2D* p1;
+	float ti;
+
+	Vector2DSub(&v, be, bs);	// displacement vector
+
+	ColliderLine* collider_line = (ColliderLine*)collider;
+	for (unsigned int i = 0; i < collider_line->lineCount; ++i)
+	{
+		p0 = &(collider_line->lineSegments[i].point[0]);
+		p1 = &(collider_line->lineSegments[i].point[1]);
+
+		Vector2DSub(&e, p1, p0);		// edge vector
+
+		Vector2DSet(&n, e.y, -e.x);
+		Vector2DNormalize(&n, &n);		// normal vector
+
+		// trivial checks
+		// is the point moving parallel to the line?
+		if (Vector2DDotProduct(&n, &v) == 0.0f)							{ continue; }
+		// is the displacement vector entirely inside the half-plane?
+		if (Vector2DDotProduct(&n, bs) <= Vector2DDotProduct(&n, p0) &&
+			Vector2DDotProduct(&n, be) <= Vector2DDotProduct(&n, p0))	{ continue; }
+		// is the displacement vector entirely outside the half-plane?
+		if (Vector2DDotProduct(&n, bs) >= Vector2DDotProduct(&n, p0) &&
+			Vector2DDotProduct(&n, be) >= Vector2DDotProduct(&n, p0))	{ continue; }
+		
+		ti = (Vector2DDotProduct(&n, p0) - Vector2DDotProduct(&n, bs)) / Vector2DDotProduct(&n, &v);
+		Vector2DScaleAdd(&bi, &v, ti, bs);
+		
+		// is point of intersection outside of the line segment?
+		Vector2DSub(&p1p0, p1, p0);
+		Vector2DSub(&bip0, &bi, p0);
+		if (Vector2DDotProduct(&p1p0, &bip0) < 0)	{ continue; }
+
+		Vector2DSub(&p0p1, p0, p1);
+		Vector2DSub(&bip1, &bi, p1);
+		if (Vector2DDotProduct(&p0p1, &bip1) < 0)	{ continue; }
+
+		continue;
+	}
+
 	return false;
 }
 
