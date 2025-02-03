@@ -16,4 +16,5 @@ BehaviorAsteroid
 -1
 0
 0.0
-Collider
+ColliderCircle
+20.0

@@ -1,0 +1,4 @@
+SpriteSource
+SpriteSourceArenaBackground
+1 1
+Assets/Arena_Background.jpg

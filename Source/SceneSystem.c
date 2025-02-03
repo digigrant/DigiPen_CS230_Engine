@@ -14,7 +14,7 @@
 #include <assert.h>
 
 #include "BaseSystem.h"
-#include "AsteroidsScene.h"
+#include "OmegaScene.h"
 #include "Scene.h"
 #include "SceneSystem.h"
 #include "StubScene.h"
@@ -138,7 +138,7 @@ static bool SceneSystemInit(void)
 {
 	// Set the starting (Default) scene.
 	// TODO: Change the starting (Default) scene from "Stub" to "Demo":
-	SceneSystemSetNext(AsteroidsSceneGetInstance());
+	SceneSystemSetNext(OmegaSceneGetInstance());
 
 	return true;
 }

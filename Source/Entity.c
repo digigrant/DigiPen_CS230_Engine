@@ -18,6 +18,8 @@
 #include "BehaviorBullet.h"
 #include "BehaviorSpaceship.h"
 #include "Collider.h"
+#include "ColliderCircle.h"
+#include "ColliderLine.h"
 #include "Physics.h"
 #include "Sprite.h"
 #include "Transform.h"
@@ -196,13 +198,17 @@ void EntityRead(Entity* entity, Stream stream)
 			continue;
 		}
 		// Collider component
-		if (strcmp(token, "Collider") == 0)
+		if (strcmp(token, "ColliderCircle") == 0)
 		{
-			/*
-			EntityAddCollider(entity, ColliderCreate());
-			ColliderRead(entity->collider, stream); // Currently doesnt do anything
+			EntityAddCollider(entity, ColliderCircleCreate());
+			ColliderCircleRead(entity->collider, stream);
 			continue;
-			*/
+		}
+		if (strcmp(token, "ColliderLine") == 0)
+		{
+			EntityAddCollider(entity, ColliderLineCreate());
+			ColliderLineRead(entity->collider, stream);
+			continue;
 		}
 		// Physics component
 		if (strcmp(token, "Physics") == 0)

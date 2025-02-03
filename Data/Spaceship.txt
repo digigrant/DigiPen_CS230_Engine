@@ -16,4 +16,5 @@ BehaviorSpaceship
 -1
 0
 0.0
-Collider
+ColliderCircle
+22.5

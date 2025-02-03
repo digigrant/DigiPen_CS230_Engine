@@ -2,7 +2,7 @@
 //
 // File Name:	OmegaScene.h
 // Author(s):	Grant Joyner (g.joyner)
-// Project:		Project 0
+// Project:		Project 6
 // Course:		CS230S24
 //
 // Copyright © 2024 DigiPen (USA) Corporation.

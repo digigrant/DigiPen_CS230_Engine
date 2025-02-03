@@ -52,6 +52,8 @@ Collider* ColliderCircleCreate()
 	if (!collider_circle) { return NULL; }
 
 	collider_circle->radius = 1.0f;
+	collider_circle->base.memorySize = sizeof(ColliderCircle);
+	collider_circle->base.type = COLLIDER_TYPE_CIRCLE;
 	return (Collider*)collider_circle;
 }
 

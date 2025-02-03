@@ -8,7 +8,7 @@ Sprite
 0
 1
 MeshArena
-None
+SpriteSourceArenaBackground
 ColliderLine
 8
  504 -364.5  504  364.5

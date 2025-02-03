@@ -13,5 +13,5 @@ BehaviorHudText
 -1
 0
 0.0
-Score: %d
+Score: %d
 0

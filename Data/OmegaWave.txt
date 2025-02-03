@@ -13,5 +13,5 @@ BehaviorHudText
 -1
 0
 0.0
-Wave: %d
+Wave: %d
 2
