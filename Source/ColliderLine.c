@@ -108,7 +108,7 @@ bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider*
 	const Vector2D* bs = PhysicsGetOldTranslation(EntityGetPhysics(other_entity));
 	const Vector2D* be = TransformGetTranslation(EntityGetTransform(other_entity));
 
-	Vector2D v, e, n, bi, p0p1, p1p0, bip0, bip1;
+	Vector2D v, e, n, bi, p0p1, p1p0, bip0, bip1, i, s, r, br;
 	const Vector2D* p0;
 	const Vector2D* p1;
 	float ti;
@@ -116,10 +116,10 @@ bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider*
 	Vector2DSub(&v, be, bs);	// displacement vector
 
 	ColliderLine* collider_line = (ColliderLine*)collider;
-	for (unsigned int i = 0; i < collider_line->lineCount; ++i)
+	for (unsigned int x = 0; x < collider_line->lineCount; ++x)
 	{
-		p0 = &(collider_line->lineSegments[i].point[0]);
-		p1 = &(collider_line->lineSegments[i].point[1]);
+		p0 = &(collider_line->lineSegments[x].point[0]);
+		p1 = &(collider_line->lineSegments[x].point[1]);
 
 		Vector2DSub(&e, p1, p0);		// edge vector
 
@@ -147,6 +147,25 @@ bool ColliderLineIsCollidingWithCircle(const Collider* collider, const Collider*
 		Vector2DSub(&p0p1, p0, p1);
 		Vector2DSub(&bip1, &bi, p1);
 		if (Vector2DDotProduct(&p0p1, &bip1) < 0)	{ continue; }
+
+		// at this point we know we are colliding
+		Vector2DSub(&i, be, &bi);	// incident vector
+		Vector2DScale(&s, &n, Vector2DDotProduct(&i, &n));		// penetration vector
+		Vector2DScale(&r, &s, 2.0f);
+		Vector2DSub(&r, &i, &r);	// reflection vector
+		Vector2DAdd(&br, &bi, &r);	// reflection endpoint
+
+		// set entity rotation
+		TransformSetTranslation(EntityGetTransform(other_entity), &br);
+		TransformSetRotation(EntityGetTransform(other_entity), Vector2DToAngleRad(&r));
+		
+		// set entity velocity
+		const Vector2D* old_vel = PhysicsGetVelocity(EntityGetPhysics(other_entity));
+		float speed = Vector2DLength(old_vel);
+		Vector2D new_vel;
+		Vector2DNormalize(&new_vel, &r);
+		Vector2DScale(&new_vel, &new_vel, speed);
+		PhysicsSetVelocity(EntityGetPhysics(other_entity), &new_vel);
 
 		continue;
 	}

@@ -23,8 +23,8 @@
 // Private Constants:
 //------------------------------------------------------------------------------
 
-static const unsigned ASTEROIDS_SPAWN_INITIAL = 0;
-static const unsigned ASTEROIDS_SPAWN_MAX = 0;
+static const unsigned ASTEROIDS_SPAWN_INITIAL = 8;
+static const unsigned ASTEROIDS_SPAWN_MAX = 20;
 
 //------------------------------------------------------------------------------
 // Private Structures:
