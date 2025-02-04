@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	CheatSystem.h
-// Author(s):	Doug Schilling (dschilling)
+// File Name:	OmegaScene.h
+// Author(s):	Grant Joyner (g.joyner)
 // Project:		Project 6
 // Course:		CS230S24
 //
@@ -25,7 +25,7 @@ extern "C" {	// Assume C declarations for C++.
 // Forward References:
 //------------------------------------------------------------------------------
 
-typedef struct BaseSystem BaseSystem;
+typedef struct Scene Scene;
 
 //------------------------------------------------------------------------------
 // Public Constants:
@@ -40,20 +40,6 @@ typedef struct BaseSystem BaseSystem;
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-// Private Structures:
-//------------------------------------------------------------------------------
-
-// An example of the structure to be defined in CheatSystem.c.
-#if 0
-typedef struct
-{
-	char key;
-	const Scene* (*getInstance)(void);
-
-} CheatSystemKeyBinding;
-#endif
-
-//------------------------------------------------------------------------------
 // Public Variables:
 //------------------------------------------------------------------------------
 
@@ -61,10 +47,12 @@ typedef struct
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Get the instance of the Stub System.
-BaseSystem* CheatSystemGetInstance(void);
+// Get the instance of the Stub Scene.
+// Returns:
+//	 Pointer to the base Scene structure for this derived Scene.
+const Scene* OmegaSceneGetInstance(void);
 
-/*----------------------------------------------------------------------------*/
+//------------------------------------------------------------------------------
 
 #ifdef __cplusplus
 }                       // End of extern "C" {

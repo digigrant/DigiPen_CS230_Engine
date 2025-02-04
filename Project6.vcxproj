@@ -181,6 +181,8 @@
     <ClCompile Include="Source\BehaviorSpaceship.c" />
     <ClCompile Include="Source\CheatSystem.c" />
     <ClCompile Include="Source\Collider.c" />
+    <ClCompile Include="Source\ColliderCircle.c" />
+    <ClCompile Include="Source\ColliderLine.c" />
     <ClCompile Include="Source\Engine.c" />
     <ClCompile Include="Source\Entity.c" />
     <ClCompile Include="Source\EntityContainer.c" />
@@ -189,6 +191,7 @@
     <ClCompile Include="Source\Matrix2D.c" />
     <ClCompile Include="Source\Mesh.c" />
     <ClCompile Include="Source\MeshLibrary.c" />
+    <ClCompile Include="Source\OmegaScene.c" />
     <ClCompile Include="Source\Physics.c" />
     <ClCompile Include="Source\PlatformSystem.c" />
     <ClCompile Include="Source\Random.c" />
@@ -227,6 +230,8 @@
     <ClInclude Include="Source\BehaviorSpaceship.h" />
     <ClInclude Include="Source\CheatSystem.h" />
     <ClInclude Include="Source\Collider.h" />
+    <ClInclude Include="Source\ColliderCircle.h" />
+    <ClInclude Include="Source\ColliderLine.h" />
     <ClInclude Include="Source\Engine.h" />
     <ClInclude Include="Source\Entity.h" />
     <ClInclude Include="Source\EntityContainer.h" />
@@ -234,6 +239,7 @@
     <ClInclude Include="Source\Matrix2D.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\MeshLibrary.h" />
+    <ClInclude Include="Source\OmegaScene.h" />
     <ClInclude Include="Source\Physics.h" />
     <ClInclude Include="Source\PlatformSystem.h" />
     <ClInclude Include="Source\Random.h" />

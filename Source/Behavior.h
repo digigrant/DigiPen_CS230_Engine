@@ -47,7 +47,7 @@ typedef void(*BehaviorFunctionPtrDt)(Behavior* behavior, float dt);
 // part of the public interface.
 typedef struct Behavior
 {
-	// Pointer to the behavior's parent entity.
+	// Pointer to the behavior's parent Entity.
 	Entity* parent;
 
 	// The following variable is used to allocate the correct amount of memory
