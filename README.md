@@ -35,6 +35,7 @@ Engine uses an out-of-source build system. It builds into 3 projects:
 - EngineLib.lib - contains all engine and game functionality
 - EngineStart.exe - starts the game
 - EngineLibTests.exe - runs over 80 automated tests
+
 The Assets, Data, and DGL library are copied into the output folder when the project is built.
 
 To generate the out-of-source build system, navigate into the CS230 Project folder and open a Powershell window. Run this command:
