@@ -26,7 +26,8 @@ Here's what the project contains:
 - **Data**: Data files that get used by the engine to initialize stuff in the scenes
 - **DGL**: Graphics library given by Doug. **There are two versions: DGL_d.lib (for Debug builds) and DGL.lib (for Release builds). When you build either configuration, the correct version needs to be linked.** Currently, building with CMake is hard-coded for the Release version to be linked - if you try to build Debug config, you will get a linker error.
 - **Scripts**: some build scripts for copying data files
-- **Source**: All of the source files for the engine. This includes Project 3 source files given by Doug, source files copied from Project 2, and some empty source files created for the Project 3 implementations. Everything needed to build the project is in there now.
+- **Source**: all of the source files for the engine
+- **Tests**: tests for each system in the engine
 - **CMakeLists.txt**: This is the file that tells CMake how to generate the out-of-source VS build system. See *Building The Project (CMake Method)*.
 
 ## Building The Project
@@ -51,4 +52,7 @@ Example:
 cmake --build . --config Release
 ```
 
-This builds the engine in the "bin" folder using the selected configuration.
+To run tests (after building the project from the Build folder):
+````
+ctest --test-dir Build --build-config <whatever config you built, e.g. Release>
+````
