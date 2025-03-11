@@ -24,35 +24,33 @@ I used this project as an opportunity to refine and expand my skills with versio
 Here's what the project contains:
 - **Assets**: Art assets for the project
 - **Data**: Data files that get used by the engine to initialize stuff in the scenes
-- **DGL**: Graphics library given by Doug. **There are two versions: DGL_d.lib (for Debug builds) and DGL.lib (for Release builds). When you build either configuration, the correct version needs to be linked.** Currently, building with CMake is hard-coded for the Release version to be linked - if you try to build Debug config, you will get a linker error.
+- **DGL**: Graphics library given by Doug. **There are two versions: DGL_d.lib (for Debug builds) and DGL.lib (for Release builds). When you build either configuration, the correct version will be linked.**
 - **Scripts**: some build scripts for copying data files
 - **Source**: all of the source files for the engine
 - **Tests**: tests for each system in the engine
-- **CMakeLists.txt**: This is the file that tells CMake how to generate the out-of-source VS build system. See *Building The Project (CMake Method)*.
+- **CMakeLists.txt**: This is the file that tells CMake how to generate the out-of-source VS build system. See below.
 
 ## Building The Project
 Engine uses an out-of-source build system. It builds into 3 projects:
 - EngineLib.lib - contains all engine and game functionality
 - EngineStart.exe - starts the game
-- EngineLibTests.exe - runs over 80 automated tests 
+- EngineLibTests.exe - runs over 80 automated tests
+The Assets, Data, and DGL library are copied into the output folder when the project is built.
 
 To generate the out-of-source build system, navigate into the CS230 Project folder and open a Powershell window. Run this command:
 ```
 cmake -S . -B Build
 ```
 
-The CMakeLists.txt file in the main directory will generate a MSVC build system into the Build folder. The build system will have Debug/Release configurations, only in x64 architecture.
+The project will be generated in the **Build** folder.
 
-To build the project, run this command:
+To build the project in Release configuration, run this command:
 ```
-cmake --build Build --config <whatever config you're trying to build>
+cmake --build Build --config Release
 ```
-Example:
-```
-cmake --build . --config Release
-```
+Project will be built in **bin/Release**.
 
-To run tests (after building the project from the Build folder):
+To run tests on Release build (after building the project from the Build folder):
 ````
-ctest --test-dir Build --build-config <whatever config you built, e.g. Release>
+ctest --test-dir Build --build-config Release
 ````
